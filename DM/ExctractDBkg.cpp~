@@ -1,0 +1,26 @@
+#include <TFile.h>
+#include <TTree.h>
+#include <TROOT.h>
+
+
+// All of the roofit stuff
+#include <RooRealVar.h>
+#include <RooDataSet.h>
+#include <RooDataHist.h>
+#include <RooGaussian.h>
+#include <RooPlot.h>
+#include <RooHistPdf.h>
+#include "Inclusion.h"
+  
+using namespace RooFit;
+using namespace RooStats;
+  
+  
+void ExtractDBkg(){
+  
+  TFile *f = new TFile("../../data/Data2016_Strip28r1_MagUp.root");
+  TTree *tr = (TTree*)f->Get("DecayTree");
+  
+  
+  
+} 

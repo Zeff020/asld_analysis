@@ -1,0 +1,4 @@
+#include <string>
+
+using namespace std;
+std::string DecreaseTreeSizeAndCuts(char filename[], char dirname[], char decsize[]);

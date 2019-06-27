@@ -1,0 +1,65 @@
+#include <TFile.h>
+#include <TTree.h>
+#include <TROOT.h>
+#include <TH1.h>
+
+
+// All of the roofit stuff
+#include <RooRealVar.h>
+#include <RooDataSet.h>
+#include <RooDataHist.h>
+#include <RooGaussian.h>
+#include <RooPlot.h>
+#include <RooHistPdf.h>
+#include "Inclusion.h"
+  
+using namespace RooFit;
+using namespace RooStats;
+  
+  
+void ExtractDBkg(){
+  
+  TFile *f = new TFile("../../data/Data2016_Strip28r1_MagUpsmall300withcutssweightsbc.root");
+  TTree *tr = (TTree*)f->Get("DecayTree");
+  
+  int nentries=tr->GetEntries();
+
+  Float_t         B_CM;
+  Double_t         D_M;
+  Float_t         D_M_bkg;
+  Float_t         B_DM_bkg;
+  
+
+  tr->SetBranchAddress("D_M", &D_M);
+  tr->SetBranchAddress("B_CM", &B_CM);
+
+  tr -> SetBranchStatus("*",0);
+  tr -> SetBranchStatus("D_M",1);
+  tr -> SetBranchStatus("B_CM",1);
+
+  TFile *newf = new TFile("../../data/D_M_bkg300bins.root","recreate");
+  TH1* hDM_bkg = new TH1F("h1", "histo with D Mass sidebands", 500, 1800, 1980);
+  TH1* hBM_DM_bkg = new TH1F("h2", "histo with the B mass datapoints of the D mass sidebands", 500, 2300,7000);
+  
+
+  for (int i = 0; i<nentries; i++){
+    tr -> GetEntry(i);
+
+    if ((D_M > 1841) && (D_M <1895)) continue;
+    D_M_bkg = D_M;
+    B_DM_bkg = B_CM;
+    //br_D_M_bkg -> Fill();
+    hDM_bkg -> Fill(D_M_bkg);
+    hBM_DM_bkg -> Fill(B_DM_bkg);
+    
+  }
+  hDM_bkg -> Write();
+  
+  newf -> Write();
+  TCanvas* a = new TCanvas("D and B mass Background","D and B mass background");
+  a->Divide(1,2);
+  a->cd(1);
+  hBM_DM_bkg -> Draw();
+  a->cd(2);
+  hDM_bkg-> Draw();
+}

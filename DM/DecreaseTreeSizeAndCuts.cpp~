@@ -1,0 +1,393 @@
+/*
+
+
+This file applies the cuts to the 2016 dataset and also is capable of decreasing it in size.
+
+
+ */
+
+
+
+#include <TFile.h>
+#include <TTree.h>
+#include <iostream>
+#include <TH1.h>
+#include <TH2.h>
+#include <TCanvas.h>
+#include <TStyle.h>
+#include <TApplication.h>
+#include <TROOT.h>
+
+#include <Math/Vector3D.h>
+#include <Math/Vector4D.h>
+#include <Math/Vector4Dfwd.h>
+#include "Inclusion.h"
+
+void DecreaseTreeSizeAndCuts(){
+
+  typedef ROOT::Math::PtEtaPhiMVector MyLorentzVector;
+
+//Get old file, old tree and set top branch address
+
+TFile *oldfile = new TFile("/eos/lhcb/user/l/lgrillo/AsldRunITuples/SLB_ntuplesRunII_v1/Data2016_Strip28r1_MagUp.root");
+TDirectoryFile* dir = (TDirectoryFile*)oldfile->Get("b2DpMuX_SS");
+TTree *oldtree = (TTree*)dir->Get("DecayTree");
+int nentries=oldtree->GetEntries();
+
+// Set variables in tree
+ Double_t       B_D_FD;
+   Double_t         B_ETA;
+   Double_t         B_ID;
+   Double_t         B_M;
+   Double_t         B_P;
+   Double_t         B_PHI;
+   Double_t         B_PT;
+   Double_t         B_VCHI2NDOF;
+   Double_t         B_ENDVERTEX_X;
+   Double_t         B_ENDVERTEX_Y;
+   Double_t         B_ENDVERTEX_Z;
+   Double_t         B_ENDVERTEX_XERR;
+   Double_t         B_ENDVERTEX_YERR;
+   Double_t         B_ENDVERTEX_ZERR;
+   Double_t         B_ENDVERTEX_CHI2;
+   Int_t            B_ENDVERTEX_NDOF;
+   Float_t          B_ENDVERTEX_COV_[3][3];
+   Double_t         B_OWNPV_X;
+   Double_t         B_OWNPV_Y;
+   Double_t         B_OWNPV_Z;
+   Double_t         B_OWNPV_XERR;
+   Double_t         B_OWNPV_YERR;
+   Double_t         B_OWNPV_ZERR;
+   Double_t         B_OWNPV_CHI2;
+   Int_t            B_OWNPV_NDOF;
+   Float_t          B_OWNPV_COV_[3][3];
+   Double_t         B_IP_OWNPV;
+   Double_t         B_IPCHI2_OWNPV;
+   Double_t         B_FD_OWNPV;
+   Double_t         B_FDCHI2_OWNPV;
+   Double_t         B_DIRA_OWNPV;
+   Double_t         D_ETA;
+   Double_t         D_ID;
+   Double_t         D_IP;
+   Double_t         D_IPCHI2;
+   Double_t         D_M;
+   Double_t         D_PHI;
+   Double_t         D_PT;
+   Double_t         D_VCHI2NDOF;
+   Double_t         D_ENDVERTEX_X;
+   Double_t         D_ENDVERTEX_Y;
+   Double_t         D_ENDVERTEX_Z;
+   Double_t         D_ENDVERTEX_XERR;
+   Double_t         D_ENDVERTEX_YERR;
+   Double_t         D_ENDVERTEX_ZERR;
+   Double_t         D_ENDVERTEX_CHI2;
+   Int_t            D_ENDVERTEX_NDOF;
+   Float_t          D_ENDVERTEX_COV_[3][3];
+   Double_t         D_OWNPV_X;
+   Double_t         D_OWNPV_Y;
+   Double_t         D_OWNPV_Z;
+   Double_t         D_OWNPV_XERR;
+   Double_t         D_OWNPV_YERR;
+   Double_t         D_OWNPV_ZERR;
+   Double_t         D_OWNPV_CHI2;
+   Int_t            D_OWNPV_NDOF;
+   Float_t          D_OWNPV_COV_[3][3];
+   Double_t         D_IP_OWNPV;
+   Double_t         D_IPCHI2_OWNPV;
+   Double_t         D_FD_OWNPV;
+   Double_t         D_FDCHI2_OWNPV;
+   Double_t         D_DIRA_OWNPV;
+   Double_t         D_ORIVX_X;
+   Double_t         D_ORIVX_Y;
+   Double_t         D_ORIVX_Z;
+   Double_t         D_ORIVX_XERR;
+   Double_t         D_ORIVX_YERR;
+   Double_t         D_ORIVX_ZERR;
+   Double_t         D_ORIVX_CHI2;
+   Int_t            D_ORIVX_NDOF;
+   Float_t          D_ORIVX_COV_[3][3];
+   Double_t         D_FD_ORIVX;
+   Double_t         D_FDCHI2_ORIVX;
+   Double_t         D_DIRA_ORIVX;
+   Double_t         K_ETA;
+   Double_t         K_GHOSTPROB;
+   Double_t         K_ID;
+   Double_t         K_IP;
+   Double_t        K_IPCHI2;
+   Double_t         K_ISMUON;
+   Double_t         K_PHI;
+   Double_t         K_PIDK;
+   Double_t         K_PIDmu;
+   Double_t         K_PIDp;
+   Double_t         K_PT;
+   Double_t         Pi1_ETA;
+   Double_t         Pi1_GHOSTPROB;
+   Double_t         Pi1_ID;
+   Double_t         Pi1_IP;
+   Double_t         Pi1_IPCHI2;
+   Double_t         Pi1_ISMUON;
+   Double_t         Pi1_PHI;
+   Double_t         Pi1_PIDK;
+   Double_t         Pi1_PIDmu;
+   Double_t         Pi1_PIDp;
+   Double_t         Pi1_PT;
+   Double_t         Pi2_ETA;
+   Double_t         Pi2_GHOSTPROB;
+   Double_t         Pi2_ID;
+   Double_t         Pi2_IP;
+   Double_t         Pi2_IPCHI2;
+   Double_t         Pi2_ISMUON;
+   Double_t         Pi2_PHI;
+   Double_t         Pi2_PIDK;
+   Double_t         Pi2_PIDmu;
+   Double_t         Pi2_PIDp;
+   Double_t         Pi2_PT;
+   Double_t         Mu_ETA;
+   Double_t         Mu_GHOSTPROB;
+   Double_t         Mu_ID;
+   Double_t         Mu_IP;
+   Double_t         Mu_IPCHI2;
+   Double_t         Mu_ISMUON;
+   Double_t         Mu_PHI;
+   Double_t         Mu_PIDK;
+   Double_t         Mu_PIDmu;
+   Double_t         Mu_PIDp;
+   Double_t         Mu_PT;
+   UInt_t           nCandidate;
+   ULong64_t        totCandidates;
+   ULong64_t        EventInSequence;
+   Int_t            nPV;
+   Float_t          PVX[100];   //[nPV]
+   Float_t          PVY[100];   //[nPV]
+   Float_t          PVZ[100];   //[nPV]
+   Float_t          PVXERR[100];   //[nPV]
+   Float_t          PVYERR[100];   //[nPV]
+   Float_t          PVZERR[100];   //[nPV]
+   Float_t          PVCHI2[100];   //[nPV]
+   Float_t          PVNDOF[100];   //[nPV]
+   Float_t          PVNTRACKS[100];   //[nPV]
+   
+
+   
+   Float_t lambda1Mass;   
+   Float_t lambda2Mass;   
+   Float_t jpsi1Mass;
+
+   static Float_t cLight  = 0.299792458; 
+   static Float_t massB   = 5279.58;   
+   static Float_t massK   = 493.677;   
+   static Float_t massPi  = 139.57 ;   
+   static Float_t massP   = 938.27;   
+   static Float_t massMu  = 105.658;
+   
+   bool fLambdaVeto = true;   
+   bool fJpsiVeto = true;
+
+   // set Branch addresses
+   oldtree->SetBranchAddress("B_D_FD", &B_D_FD);
+   oldtree->SetBranchAddress("B_ETA", &B_ETA);
+   oldtree->SetBranchAddress("B_ID", &B_ID);
+   oldtree->SetBranchAddress("B_M", &B_M);
+   oldtree->SetBranchAddress("B_P", &B_P);
+   oldtree->SetBranchAddress("B_PHI", &B_PHI);
+   oldtree->SetBranchAddress("B_PT", &B_PT);
+   oldtree->SetBranchAddress("B_VCHI2NDOF", &B_VCHI2NDOF);
+   oldtree->SetBranchAddress("B_ENDVERTEX_X", &B_ENDVERTEX_X);
+   oldtree->SetBranchAddress("B_ENDVERTEX_Y", &B_ENDVERTEX_Y);
+   oldtree->SetBranchAddress("B_ENDVERTEX_Z", &B_ENDVERTEX_Z);
+   oldtree->SetBranchAddress("B_ENDVERTEX_XERR", &B_ENDVERTEX_XERR);
+   oldtree->SetBranchAddress("B_ENDVERTEX_YERR", &B_ENDVERTEX_YERR);
+   oldtree->SetBranchAddress("B_ENDVERTEX_ZERR", &B_ENDVERTEX_ZERR);
+   oldtree->SetBranchAddress("B_ENDVERTEX_CHI2", &B_ENDVERTEX_CHI2);
+   oldtree->SetBranchAddress("B_ENDVERTEX_NDOF", &B_ENDVERTEX_NDOF);
+   oldtree->SetBranchAddress("B_ENDVERTEX_COV_", B_ENDVERTEX_COV_);
+   oldtree->SetBranchAddress("B_OWNPV_X", &B_OWNPV_X);
+   oldtree->SetBranchAddress("B_OWNPV_Y", &B_OWNPV_Y);
+   oldtree->SetBranchAddress("B_OWNPV_Z", &B_OWNPV_Z);
+   oldtree->SetBranchAddress("B_OWNPV_XERR", &B_OWNPV_XERR);
+   oldtree->SetBranchAddress("B_OWNPV_YERR", &B_OWNPV_YERR);
+   oldtree->SetBranchAddress("B_OWNPV_ZERR", &B_OWNPV_ZERR);
+   oldtree->SetBranchAddress("B_OWNPV_CHI2", &B_OWNPV_CHI2);
+   oldtree->SetBranchAddress("B_OWNPV_NDOF", &B_OWNPV_NDOF);
+   oldtree->SetBranchAddress("B_OWNPV_COV_", B_OWNPV_COV_);
+   oldtree->SetBranchAddress("B_IP_OWNPV", &B_IP_OWNPV);
+   oldtree->SetBranchAddress("B_IPCHI2_OWNPV", &B_IPCHI2_OWNPV);
+   oldtree->SetBranchAddress("B_FD_OWNPV", &B_FD_OWNPV);
+   oldtree->SetBranchAddress("B_FDCHI2_OWNPV", &B_FDCHI2_OWNPV);
+   oldtree->SetBranchAddress("B_DIRA_OWNPV", &B_DIRA_OWNPV);
+   oldtree->SetBranchAddress("D_ETA", &D_ETA);
+   oldtree->SetBranchAddress("D_ID", &D_ID);
+   oldtree->SetBranchAddress("D_IP", &D_IP);
+   oldtree->SetBranchAddress("D_IPCHI2", &D_IPCHI2);
+   oldtree->SetBranchAddress("D_M", &D_M);
+   oldtree->SetBranchAddress("D_PHI", &D_PHI);
+   oldtree->SetBranchAddress("D_PT", &D_PT);
+   oldtree->SetBranchAddress("D_VCHI2NDOF", &D_VCHI2NDOF);
+   oldtree->SetBranchAddress("D_ENDVERTEX_X", &D_ENDVERTEX_X);
+   oldtree->SetBranchAddress("D_ENDVERTEX_Y", &D_ENDVERTEX_Y);
+   oldtree->SetBranchAddress("D_ENDVERTEX_Z", &D_ENDVERTEX_Z);
+   oldtree->SetBranchAddress("D_ENDVERTEX_XERR", &D_ENDVERTEX_XERR);
+   oldtree->SetBranchAddress("D_ENDVERTEX_YERR", &D_ENDVERTEX_YERR);
+   oldtree->SetBranchAddress("D_ENDVERTEX_ZERR", &D_ENDVERTEX_ZERR);
+   oldtree->SetBranchAddress("D_ENDVERTEX_CHI2", &D_ENDVERTEX_CHI2);
+   oldtree->SetBranchAddress("D_ENDVERTEX_NDOF", &D_ENDVERTEX_NDOF);
+   oldtree->SetBranchAddress("D_ENDVERTEX_COV_", D_ENDVERTEX_COV_);
+   oldtree->SetBranchAddress("D_OWNPV_X", &D_OWNPV_X);
+   oldtree->SetBranchAddress("D_OWNPV_Y", &D_OWNPV_Y);
+   oldtree->SetBranchAddress("D_OWNPV_Z", &D_OWNPV_Z);
+   oldtree->SetBranchAddress("D_OWNPV_XERR", &D_OWNPV_XERR);
+   oldtree->SetBranchAddress("D_OWNPV_YERR", &D_OWNPV_YERR);
+   oldtree->SetBranchAddress("D_OWNPV_ZERR", &D_OWNPV_ZERR);
+   oldtree->SetBranchAddress("D_OWNPV_CHI2", &D_OWNPV_CHI2);
+   oldtree->SetBranchAddress("D_OWNPV_NDOF", &D_OWNPV_NDOF);
+   oldtree->SetBranchAddress("D_OWNPV_COV_", D_OWNPV_COV_);
+   oldtree->SetBranchAddress("D_IP_OWNPV", &D_IP_OWNPV);
+   oldtree->SetBranchAddress("D_IPCHI2_OWNPV", &D_IPCHI2_OWNPV);
+   oldtree->SetBranchAddress("D_FD_OWNPV", &D_FD_OWNPV);
+   oldtree->SetBranchAddress("D_FDCHI2_OWNPV", &D_FDCHI2_OWNPV);
+   oldtree->SetBranchAddress("D_DIRA_OWNPV", &D_DIRA_OWNPV);
+   oldtree->SetBranchAddress("D_ORIVX_X", &D_ORIVX_X);
+   oldtree->SetBranchAddress("D_ORIVX_Y", &D_ORIVX_Y);
+   oldtree->SetBranchAddress("D_ORIVX_Z", &D_ORIVX_Z);
+   oldtree->SetBranchAddress("D_ORIVX_XERR", &D_ORIVX_XERR);
+   oldtree->SetBranchAddress("D_ORIVX_YERR", &D_ORIVX_YERR);
+   oldtree->SetBranchAddress("D_ORIVX_ZERR", &D_ORIVX_ZERR);
+   oldtree->SetBranchAddress("D_ORIVX_CHI2", &D_ORIVX_CHI2);
+   oldtree->SetBranchAddress("D_ORIVX_NDOF", &D_ORIVX_NDOF);
+   oldtree->SetBranchAddress("D_ORIVX_COV_", D_ORIVX_COV_);
+   oldtree->SetBranchAddress("D_FD_ORIVX", &D_FD_ORIVX);
+   oldtree->SetBranchAddress("D_FDCHI2_ORIVX", &D_FDCHI2_ORIVX);
+   oldtree->SetBranchAddress("D_DIRA_ORIVX", &D_DIRA_ORIVX);
+   oldtree->SetBranchAddress("K_ETA", &K_ETA);
+   oldtree->SetBranchAddress("K_GHOSTPROB", &K_GHOSTPROB);
+   oldtree->SetBranchAddress("K_ID", &K_ID);
+   oldtree->SetBranchAddress("K_IP", &K_IP);
+   oldtree->SetBranchAddress("K_IPCHI2", &K_IPCHI2);
+   oldtree->SetBranchAddress("K_ISMUON", &K_ISMUON);
+   oldtree->SetBranchAddress("K_PHI", &K_PHI);
+   oldtree->SetBranchAddress("K_PIDK", &K_PIDK);
+   oldtree->SetBranchAddress("K_PIDmu", &K_PIDmu);
+   oldtree->SetBranchAddress("K_PIDp", &K_PIDp);
+   oldtree->SetBranchAddress("K_PT", &K_PT);
+   oldtree->SetBranchAddress("Pi1_ETA", &Pi1_ETA);
+   oldtree->SetBranchAddress("Pi1_GHOSTPROB", &Pi1_GHOSTPROB);
+   oldtree->SetBranchAddress("Pi1_ID", &Pi1_ID);
+   oldtree->SetBranchAddress("Pi1_IP", &Pi1_IP);
+   oldtree->SetBranchAddress("Pi1_IPCHI2", &Pi1_IPCHI2);
+   oldtree->SetBranchAddress("Pi1_ISMUON", &Pi1_ISMUON);
+   oldtree->SetBranchAddress("Pi1_PHI", &Pi1_PHI);
+   oldtree->SetBranchAddress("Pi1_PIDK", &Pi1_PIDK);
+   oldtree->SetBranchAddress("Pi1_PIDmu", &Pi1_PIDmu);
+   oldtree->SetBranchAddress("Pi1_PIDp", &Pi1_PIDp);
+   oldtree->SetBranchAddress("Pi1_PT", &Pi1_PT);
+   oldtree->SetBranchAddress("Pi2_ETA", &Pi2_ETA);
+   oldtree->SetBranchAddress("Pi2_GHOSTPROB", &Pi2_GHOSTPROB);
+   oldtree->SetBranchAddress("Pi2_ID", &Pi2_ID);
+   oldtree->SetBranchAddress("Pi2_IP", &Pi2_IP);
+   oldtree->SetBranchAddress("Pi2_IPCHI2", &Pi2_IPCHI2);
+   oldtree->SetBranchAddress("Pi2_ISMUON", &Pi2_ISMUON);
+   oldtree->SetBranchAddress("Pi2_PHI", &Pi2_PHI);
+   oldtree->SetBranchAddress("Pi2_PIDK", &Pi2_PIDK);
+   oldtree->SetBranchAddress("Pi2_PIDmu", &Pi2_PIDmu);
+   oldtree->SetBranchAddress("Pi2_PIDp", &Pi2_PIDp);
+   oldtree->SetBranchAddress("Pi2_PT", &Pi2_PT);
+   oldtree->SetBranchAddress("Mu_ETA", &Mu_ETA);
+   oldtree->SetBranchAddress("Mu_GHOSTPROB", &Mu_GHOSTPROB);
+   oldtree->SetBranchAddress("Mu_ID", &Mu_ID);
+   oldtree->SetBranchAddress("Mu_IP", &Mu_IP);
+   oldtree->SetBranchAddress("Mu_IPCHI2", &Mu_IPCHI2);
+   oldtree->SetBranchAddress("Mu_ISMUON", &Mu_ISMUON);
+   oldtree->SetBranchAddress("Mu_PHI", &Mu_PHI);
+   oldtree->SetBranchAddress("Mu_PIDK", &Mu_PIDK);
+   oldtree->SetBranchAddress("Mu_PIDmu", &Mu_PIDmu);
+   oldtree->SetBranchAddress("Mu_PIDp", &Mu_PIDp);
+   oldtree->SetBranchAddress("Mu_PT", &Mu_PT);
+   oldtree->SetBranchAddress("nCandidate", &nCandidate);
+   oldtree->SetBranchAddress("totCandidates", &totCandidates);
+   oldtree->SetBranchAddress("EventInSequence", &EventInSequence);
+   oldtree->SetBranchAddress("nPV", &nPV);
+   oldtree->SetBranchAddress("PVX", PVX);
+   oldtree->SetBranchAddress("PVY", PVY);
+   oldtree->SetBranchAddress("PVZ", PVZ);
+   oldtree->SetBranchAddress("PVXERR", PVXERR);
+   oldtree->SetBranchAddress("PVYERR", PVYERR);
+   oldtree->SetBranchAddress("PVZERR", PVZERR);
+   oldtree->SetBranchAddress("PVCHI2", PVCHI2);
+   oldtree->SetBranchAddress("PVNDOF", PVNDOF);
+   oldtree->SetBranchAddress("PVNTRACKS", PVNTRACKS);
+
+   TFile *newfile = new TFile("../../data/Data2016_Strip28r1_MagUp_SSsmall50withcuts.root","recreate"); // The 300 after small refers to the fact that the tree was decreased in size by a factor of 300
+   TTree *newtree = oldtree->CloneTree(0);
+
+for (Long64_t i=0;i<(nentries/50); i++) {
+      oldtree->GetEntry(i);
+
+      // ------------------------------------- CUTS --------------------------------------------- //   
+
+      // "old" cali cuts
+   if ( Mu_PT < 1200. ) continue;
+   if ( Pi1_PT < 1200. ) continue ; 
+   if ( K_PT < 300. ) continue ;
+   if ( Pi2_PT < 300. ) continue ; 
+   if ( Mu_PT*cosh(Mu_ETA) < 3000. ) continue ; 
+   if ( Pi1_PT*cosh(Pi1_ETA) < 3000. ) continue ; 
+   if ( Pi2_PT*cosh(Pi2_ETA) < 3000. ) continue ; 
+   if ( K_PT*cosh(K_ETA) < 3000. ) continue ;
+
+   // cali cuts
+   if ( Mu_PT*cosh(Mu_ETA) < 6000. ) continue ;
+   if ( Pi1_PT*cosh(Pi1_ETA) < 6000. ) continue ;
+
+   // Lorentz vector cuts (Leave them out for now)
+   /*
+   MyLorentzVector LorentzMuon = MyLorentzVector(Mu_PT,Mu_ETA,Mu_PHI, massMu);       
+   float Mu_Px = LorentzMuon.Px();    
+   if (( std::fabs(Mu_Px) < (Mu_PT*cosh(Mu_ETA) - 3400.)) && (std::fabs(Mu_Px)< 600. || std::fabs(Mu_Px)> 1100.)) continue;
+   */
+
+   // PIDK cuts
+   if(K_PIDK < 7)continue;       
+   if(Pi2_PIDK > 3)continue;       
+   if(Pi1_PIDK > 10)continue;
+   
+   // Log IP cut
+   if ( log(D_IP) < -3.0 ) continue; 
+   
+
+   // D mass cut
+   if ((D_M < 1800) || (D_M > 1980)) continue; 
+   
+   // Lambda Veto
+   MyLorentzVector vK = MyLorentzVector(K_PT,K_ETA,K_PHI, massK);     
+   MyLorentzVector vPi1 = MyLorentzVector(Pi1_PT,Pi1_ETA,Pi1_PHI, massP);       
+   MyLorentzVector vPi2 = MyLorentzVector(Pi2_PT,Pi2_ETA,Pi2_PHI, massPi);       
+   lambda1Mass = (vK+vPi1+vPi2).M();       
+   vPi1.SetM( massPi );       
+   vPi2.SetM( massP  );       
+   lambda2Mass = (vK+vPi1+vPi2).M();
+
+   // Jpsi veto
+   MyLorentzVector vMu = MyLorentzVector(Mu_PT,Mu_ETA,Mu_PHI, massMu);
+   vPi1.SetM( massMu );       
+   jpsi1Mass = (vMu+vPi1).M();
+
+   if ( fLambdaVeto )
+     {
+       if( Pi1_PIDp > 10 && lambda1Mass > 2260 && lambda1Mass < 2310 ) continue; 	
+       if( Pi2_PIDp > 10 && lambda2Mass > 2260 && lambda2Mass < 2310 ) continue;       
+     }       
+   if ( fJpsiVeto )
+     { 	
+       if( Pi1_ISMUON == 1 && jpsi1Mass > 3070 && jpsi1Mass < 3150   ) continue;      
+     }
+   
+   // Fill new datapoint in tree if all cuts are accepted
+     newtree->Fill();           
+ }
+   
+
+newtree->Print();
+newtree->AutoSave();
+delete oldfile;
+delete newfile;
+}

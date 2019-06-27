@@ -1,0 +1,90 @@
+#include <TFile.h>
+#include <TTree.h>
+#include <iostream>
+#include <TH1.h>
+#include <TCanvas.h>
+#include <TStyle.h>
+#include <TApplication.h>
+
+// All of the roofit stuff
+#include <RooRealVar.h>
+#include <RooDataSet.h>
+#include <RooDataHist.h>
+#include <RooGaussian.h>
+#include <RooPlot.h>
+#include <RooHistPdf.h>
+
+using namespace RooFit;
+
+int main(){
+  TDirectoryFile* dir;
+  TTree* tr;
+  TFile* f;
+  
+  Double_t D_M;
+  
+  
+
+  TApplication *myapp=new TApplication("myapp",0,0);
+
+  gStyle->SetLabelSize(0.045,"x");
+  gStyle->SetLabelSize(0.045,"y");
+  gStyle->SetTitleSize(0.05,"x");
+  gStyle->SetTitleSize(0.05,"y");
+  gStyle->SetOptFit(1);
+
+  TH1D* mass = new TH1D("D_Mass","",100,1000,2000);
+
+  f = new TFile("/eos/lhcb/user/l/lgrillo/AsldRunITuples/SLB_ntuplesRunII_v1/Data2016_Strip28r1_MagUp.root");
+
+  // Extracting the directory from the file
+  dir = (TDirectoryFile*)f->Get("b2DsMuX");
+  
+  // Extracting the tree from the directory
+  tr = (TTree*)dir->Get("DecayTree");
+  
+  tr->SetBranchAddress("D_M", &D_M);
+
+  // Getting the number of entries and printing, then filling only 1/1000th of the data into histogram for time benefits
+  int nentries=tr->GetEntries();
+  
+  for (int i=0; i<nentries/1000; i++){
+   
+    tr->GetEntry(i);
+      
+      if (D_M != 0){
+	mass->Fill(D_M);
+      }
+      
+  }
+
+  RooRealVar* y = new RooRealVar("y", "y", 3000, 7000);
+  RooDataHist Datahist_D_M("Datahist_Bd_C", "Datahist_Bd_C", *y, mass,1.0);
+  RooHistPdf D_MPdf("BdPdf_C", "BdPdf_C", RooArgSet(*y), Datahist_D_M, 0);
+  
+  RooRealVar *mean1 = new RooRealVar("mean1","mean1",1866.1,1830.,1900.); 	
+  RooRealVar *sigma1 = new RooRealVar("sigma1","sigma1",5.0,3.0,20.0);         
+  RooAbsPdf *gauss1 = new RooGaussian("gauss1","gauss(mD, mean1, sigma1)",*mD,*mean1,*sigma1);
+
+  /*
+  This is another method of getting the data into DataHist but it doesn't work for now
+
+  RooRealVar *mD = new RooRealVar("D_M","mass D",low_mass, high_mass,"MeV");
+  RooDataSet *data = new RooDataSet("fitData","fit input dataset",tr,RooArgList(*mD));		
+  RooDataHist *data2 = data->binnedClone();
+  */
+  
+  // Applying some fitting models
+
+  
+  
+  // Drawing canvas
+  TCanvas* D_mass_fit = new TCanvas("D_mass_fit", "D_mass_fit", 0, 650, 650, 550);
+
+  D_mass_fit->cd();
+
+  RooPlot* D_Mframe = y->frame(Title("D mass")) ;
+  D_Mframe->Draw();
+  std::cout << "Hello World";
+
+}
