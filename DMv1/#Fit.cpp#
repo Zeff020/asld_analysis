@@ -22,8 +22,8 @@ This file fits the D mass data from the 2016 dataset, and following this calcula
 using namespace RooFit;
 using namespace RooStats;
 
-void Fit(char filenameDFit[]){
-  TFile *f = new TFile(filenameDFit[]);
+void Fit(char filename[]){
+  TFile *f = new TFile(filename);
   TTree *tr = (TTree*)f->Get("DecayTree");
   int nentries=tr->GetEntries();
 
@@ -74,7 +74,7 @@ void Fit(char filenameDFit[]){
   data->statOn(mD_frame, What("N"), Layout(.64, .89, .88));
   //mD_frame->Draw();
   
-  
+
   
   // Pull plot
   RooHist* hpull = mD_frame->pullHist("Data","Model") ;
