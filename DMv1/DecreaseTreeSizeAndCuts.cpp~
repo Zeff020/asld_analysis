@@ -29,7 +29,6 @@ std::string DecreaseTreeSizeAndCuts(char filename[], char dirname[], char decsiz
   typedef ROOT::Math::PtEtaPhiMVector MyLorentzVector;
 
   int idecsize = atoi(decsize);
-
 //Get old file, old tree and set top branch address
 
 
@@ -143,7 +142,7 @@ int nentries=oldtree->GetEntries();
    
 
    std::string newfilename = newfilenamenoroot + decsize_s + root;
-   char newfilename_c[] = newfilename.c_str();
+   const char *newfilename_c = newfilename.c_str();
    
 
    TFile *newfile = new TFile(newfilename_c,"recreate");
