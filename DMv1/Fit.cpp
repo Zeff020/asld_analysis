@@ -8,6 +8,7 @@ This file fits the D mass data from the 2016 dataset, and following this calcula
 #include <TFile.h>
 #include <TTree.h>
 #include <TROOT.h>
+#include <string>
 
 
 // All of the roofit stuff
@@ -16,26 +17,23 @@ This file fits the D mass data from the 2016 dataset, and following this calcula
 #include <RooDataHist.h>
 #include <RooGaussian.h>
 #include <RooPlot.h>
+#include <typeinfo>
 #include <RooHistPdf.h>
 #include "Inclusion.h"
 
+using namespace std;
 using namespace RooFit;
 using namespace RooStats;
 
-void Fit(){
-  TFile *f = new TFile("./data/Data2016_Strip28r1_MagUpsmall20withcuts.root");
-  TTree *tr = (TTree*)f->Get("DecayTree");
-  int nentries=tr->GetEntries();
-
+std::string Fit(const char* filename){
+  
+  TFile *f = new TFile(filename);
+  TH1D *D_M_hist = static_cast<TH1D *>(f->Get("D_M_hist"));
+  
   // Define mass boundaries
   RooRealVar *mD = new RooRealVar("D_M","mass D",1800, 1980,"MeV"); 
   // Create RooDataSet from the tree
-  RooDataSet * data = new RooDataSet("fitData","fit input dataset",tr,RooArgList(*mD));	
-  
-  // The below line is optional, it adjusts the number of bins!!!
-  ((RooRealVar*)data->get()->find("D_M"))->setBins(20);
-
-  RooDataHist *data2 = data->binnedClone();
+  RooDataHist * data = new RooDataHist("fitData","fit input dataset",RooArgList(*mD),D_M_hist);	
   
   //----------------------------------------------- FITTING ----------------------------------------------------//
   RooRealVar *FC = new RooRealVar("FC","FC",0.50,0.0,1.0); 	
@@ -59,7 +57,7 @@ void Fit(){
 
   RooAddPdf *model = new RooAddPdf("model", "model", RooArgList(*Sig_mD, *Bkg_mD), RooArgList(*nsig, *nbkg));
 
-  model -> fitTo(*data2);
+  model -> fitTo(*data);
 
 
   //-------------------------------------------------PLOTTING-------------------------------------------------//
@@ -108,12 +106,22 @@ void Fit(){
   //---------------------------------------------B CORRECTED------------------------------------------------//
   
   //-------------------------------------------------SAVE---------------------------------------------------//
-  
+
+  std::string filename_s(filename);
+  std::string root = ".root";
+  std::string DM = "DM";
+  std::string newfilenamenoroot = filename_s.erase(filename_s.find(".root"));
+  newfilenamenoroot = filename_s.erase(filename_s.find("DM"));
+
+  std::string newfilename = newfilenamenoroot + "sweights";
+  const char *newfilename_c = newfilename.c_str();
+
+
   // Creating new TFile to save TTree in
-  TFile* newf = new TFile("./data/Data2016_Strip28r1_MagUpwithsmall20withcutssweights.root", "recreate");
+  TFile* newf = new TFile(newfilename_c, "recreate");
   
   // Copying the original TTree
-  TTree* trout = tr -> CloneTree(); 
+  TTree* trout = new TTree("SweightsTree", "S weights tree");
   
 
   Float_t float_N_sig_sw;
@@ -125,7 +133,7 @@ void Fit(){
   for (int i = 0; i <nentries_trout; i++)
     {
 
-      tr -> GetEntry(i);
+      trout -> GetEntry(i);
       
       float_N_sig_sw = sDataPlot -> GetSWeight(i, "nsig_sw");
       float_N_bkg_sw = sDataPlot -> GetSWeight(i, "nbkg_sw");
@@ -136,7 +144,7 @@ void Fit(){
     }
 
   newf -> Write();
-  
+
 }
 
 
