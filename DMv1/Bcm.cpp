@@ -1,6 +1,6 @@
 /*
 
-This file calculates the corrected B mass of the B data in a given treee and saves it into a new tree.
+This file calculates the corrected B mass of the B data in a given tree and saves it into a new tree.
 
 */
 
@@ -27,12 +27,12 @@ This file calculates the corrected B mass of the B data in a given treee and sav
 #include "Inclusion.h"
 
 
-void Bcm(){
+std::string Bcm(const char* filename){
 
   typedef ROOT::Math::PtEtaPhiMVector MyLorentzVector;
   typedef ROOT::Math::XYZVector ThreeVector;
 
-  TFile *oldf = new TFile("./data/Data2016_Strip28r1_MagUpsmall20withcutssweight.root");
+  TFile *oldf = new TFile(filename);
   TTree *oldtr = (TTree*)oldf -> Get("DecayTree");
 
 
@@ -49,10 +49,6 @@ void Bcm(){
   Double_t         D_M;
   
   Float_t B_CM;
-  Float_t B_CM_SB;
-  Float_t B_CM_SR;
-  Float_t B_M_SB;
-  Float_t B_M_SR;
   
   static Float_t massB   = 5279.58;
   Int_t nentries=oldtr->GetEntries();
@@ -69,13 +65,29 @@ void Bcm(){
   oldtr -> SetBranchAddress("B_ENDVERTEX_Z", &B_ENDVERTEX_Z);
   oldtr -> SetBranchAddress("D_M", &D_M);  
 
-  TFile *newf = new TFile("../../data/Data2016_Strip28r1_MagUpsmall100withcutssweightbc.root", "recreate");
+  oldtr -> SetBranchStatus("*",0);
+  oldtr -> SetBranchStatus("D_M",1); // Set branch status such that only D_M is cloned to new tree
+
+
+  // Making a new file name
+  std::string filename_s(filename);
+  std::string root = ".root";
+  std::string bcm = "Bcm";
+
+  std::string newfilenamenoroot = filename_s.erase(filename_s.find(".root"));
+
+  std::string newfilename = newfilenamenoroot + bcm + root;
+  const char *newfilename_c = newfilename.c_str();
+
+  
+
+  TFile *newf = new TFile(newfilename_c, "recreate");
   TTree *newtr = oldtr->CloneTree();
 
   // Initialize a corrected mass hist
   //TH1F * B_corrected_mass = new TH1F("B_corrected_mass", "B_corrected_mass", 200, 0.0, 12000.0);
   //B_corrected_mass->Sumw2();
-
+  oldtr -> SetBranchStatus("*",1);
   
   auto br_B_CM = newtr -> Branch("B_CM",&B_CM, "B_CM/F");
 
@@ -107,4 +119,6 @@ void Bcm(){
   //B_corrected_mass->Write();
   delete oldf;
   delete newf;
+
+  return newfilename;
 }
