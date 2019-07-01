@@ -25,7 +25,7 @@ using namespace std;
 using namespace RooFit;
 using namespace RooStats;
 
-std::string Fit(const char* filename){
+std::string Fit(const char* filename,const char* filenamedata){
   
   TFile *f = new TFile(filename);
   TH1D *D_M_hist = static_cast<TH1D *>(f->Get("D_M_hist"));
@@ -90,16 +90,29 @@ std::string Fit(const char* filename){
   mean1->setConstant();		
   par->setConstant();		
   FC->setConstant();
-		
-  RooStats::SPlot* sDataPlot = new RooStats::SPlot("sData","Data sPlot", *data, model, RooArgList(*nsig,*nbkg));
+
+  TFile *f1 = new TFile(filenamedata);
+  TTree *tr = (TTree*)f1->Get("DecayTree");
+
+  Double_t         D_M;
+
+  tr->SetBranchAddress("D_M", &D_M);
+
+  tr->SetBranchStatus("*",0);
+  tr->SetBranchStatus("D_M",1);
+
+  // Create RooDataSet from the tree
+  RooDataSet * data1 = new RooDataSet("fitData","fit input dataset",tr,RooArgList(*mD));	
+  
+  RooStats::SPlot* sDataPlot = new RooStats::SPlot("sData","Data sPlot", *data1, model, RooArgList(*nsig,*nbkg)); // Calculate sweights against original, unbinned data
 
   
-  //RooDataSet * data_sig = new RooDataSet(data->GetName(),data->GetTitle(),data,*data->get(),0,"nsig_sw") ; 	
-  //RooDataSet * data_bkg = new RooDataSet(data->GetName(),data->GetTitle(),data,*data->get(),0,"nbkg_sw") ;
+  // RooDataSet * data_sig = new RooDataSet(data->GetName(),data->GetTitle(),data,*data->get(),0,"nsig_sw") ; 	
+  // RooDataSet * data_bkg = new RooDataSet(data->GetName(),data->GetTitle(),data,*data->get(),0,"nbkg_sw") ;
   
   nsig->Print();   
   double Nsig = nsig->getValV();   
-  double Nall = data->numEntries();
+  double Nall = data1->numEntries();
   cout << Nsig << " signal events; Significance = " << Nsig/sqrt(Nall) << endl;
 
   
@@ -113,7 +126,7 @@ std::string Fit(const char* filename){
   std::string newfilenamenoroot = filename_s.erase(filename_s.find(".root"));
   newfilenamenoroot = filename_s.erase(filename_s.find("DM"));
 
-  std::string newfilename = newfilenamenoroot + "sweights";
+  std::string newfilename = newfilenamenoroot + "sweights" + root;
   const char *newfilename_c = newfilename.c_str();
 
 
@@ -121,8 +134,8 @@ std::string Fit(const char* filename){
   TFile* newf = new TFile(newfilename_c, "recreate");
   
   // Copying the original TTree
-  TTree* trout = new TTree("SweightsTree", "S weights tree");
-  
+  //TTree* trout = new TTree("SweightsTree", "S weights tree");
+  TTree *trout = tr -> CloneTree();
 
   Float_t float_N_sig_sw;
   Float_t float_N_bkg_sw;
@@ -133,7 +146,7 @@ std::string Fit(const char* filename){
   for (int i = 0; i <nentries_trout; i++)
     {
 
-      trout -> GetEntry(i);
+      tr -> GetEntry(i);
       
       float_N_sig_sw = sDataPlot -> GetSWeight(i, "nsig_sw");
       float_N_bkg_sw = sDataPlot -> GetSWeight(i, "nbkg_sw");
@@ -144,6 +157,7 @@ std::string Fit(const char* filename){
     }
 
   newf -> Write();
+  return newfilename;
 
 }
 

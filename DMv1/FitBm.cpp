@@ -137,9 +137,9 @@ int FitBm(){
    f3->Delete();
    //--------------------------Getting the histogram with D mass background-----------------------------------------//
    TFile *f4 = new TFile("../../data/D_M_bkg500bins.root");
-   TH1F *h2 = (TH1F*)f4->Get("h2");
-   
-   RooDataHist* BM_DM_bkg= new RooDataHist("Bss_mc", "dataset with y", *y, h2);
+   TH1F *h2Bmass = (TH1F*)f4->Get("h2Bmass");
+
+   RooDataHist* BM_DM_bkg= new RooDataHist("Bss_mc", "dataset with y", *y, h2Bmass);
    RooHistPdf* BM_DM_bkg_Pdf=new RooHistPdf("SSPdf_C", "SSPdf_C", RooArgSet(*y), *BM_DM_bkg, 0);
    
    f4->Close();

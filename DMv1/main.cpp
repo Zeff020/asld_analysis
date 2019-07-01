@@ -5,7 +5,10 @@
 
 using namespace std;
 int main(int argc, char** argv){
-  /* First input is filename, second is directory name, third is size by which it is decreased. Do 1 for no decrease in size.
+  /* 
+
+     
+     First input is filename, second is directory name, third is size by which it is decreased. Do 1 for no decrease in size.
 
 
    */
@@ -14,13 +17,19 @@ int main(int argc, char** argv){
   
   const char* filenameCuts = filenameCuts_s.c_str();
   
-  std::string filenameDMhist_s = DmHist(filenameCuts);
+  std::string filenameDMhist_s = DmHist(filenameCuts); // Generate histogram for D mass to make it easier to handle
 
   const char* filenameDMhist = filenameDMhist_s.c_str();
   
-  cout << "Filename before function" << filenameDMhist << endl;
-  cout << "Type of filename before function" << typeid(filenameDMhist).name()<<endl;
-  std::string filenameDFit = Fit(filenameDMhist);
+  std::string filenamesweights_s = Fit(filenameDMhist,filenameCuts);
+
+  std::string filenameCutsBCorr_s = Bcm(filenameCuts); // Generate B corrected mass and add it to TTree
+
+  const char* filenameCutsBCorr = filenameCutsBCorr_s.c_str();
+
+  std::string filenameCutsBcorrDbkg = ExtractDBkg(filenameCutsBCorr);
+
+  
   
   return 0;
 
