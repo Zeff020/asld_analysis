@@ -20,7 +20,7 @@ int FitBm(){
   
 
   //-------------------------- Getting the original dataset and extracting a weighted roodatahist-------------------------------------//
-  TFile *f = new TFile("../../data/Data2016_Strip28r1_MagUpsmall300withcutssweightsbc.root");
+  TFile *f = new TFile("/afs/cern.ch/work/z/zwolffs/public/data/DataRun/Data2016_Strip28r1_MagUp300Bcm.root");
   TTree *tr = (TTree*)f->Get("DecayTree");
   
   Float_t nsig_sw;
@@ -29,16 +29,21 @@ int FitBm(){
   Int_t nentries = 0; //Providing initial value
   nentries = tr -> GetEntries();
 
-  tr -> SetBranchAddress("nsig_sw",&nsig_sw);
   tr -> SetBranchAddress("B_CM",&B_CM);
   
   TH1D * B_corr_mass_weighted = new TH1D("B_mass", "B_mass", 250, 2000.0, 10000.0);
   B_corr_mass_weighted -> Sumw2();
+  
+  // Getting the SWeights
+  TFile *fsweights = new TFile("/afs/cern.ch/work/z/zwolffs/public/data/DataRun/Data2016_Strip28r1_MagUp300sweights.root");
+  TTree *trsweights = (TTree*)fsweights->Get("DecayTree");
    
-   
+  trsweights -> SetBranchAddress("nsig_sw",&nsig_sw);
+
   for (int i = 0; i<nentries; i++){
     
     tr -> GetEntry(i);
+    trsweights -> GetEntry(i);
     B_corr_mass_weighted -> Fill(B_CM,nsig_sw);
     
   }
@@ -51,10 +56,15 @@ int FitBm(){
    //B_corr_mass_weighted -> Delete();
    f->Delete();
    
+   trsweights->Delete();
+   fsweights->Close();
+   //B_corr_mass_weighted -> Delete();
+   fsweights->Delete();
+   
    //-------------------------- Getting the MC Bd dataset and extracting a roodatahist and PDF----------------------------------------//
    
    // OPTION 1
-   TFile *f1 = new TFile("../../data/MC2015Bd_Upwithcutsbc.root");
+   TFile *f1 = new TFile("/afs/cern.ch/work/z/zwolffs/public/data/DataRun/MC2015Bd_Up1Bcm.root");
    TTree *tr1 = (TTree*)f1->Get("DecayTree");
    
 
@@ -83,7 +93,7 @@ int FitBm(){
    //Bd_mc_mass -> Delete();
    f1->Delete();
    //--------------------------Getting the MC Bu dataset and extracting a roodatahist and PDF-----------------------------------------//
-   TFile *f2 = new TFile("../../data/MC2015Bu_Upwithcutsbc.root");
+   TFile *f2 = new TFile("/afs/cern.ch/work/z/zwolffs/public/data/DataRun/MC2015Bu_Up1Bcm.root");
    TTree *tr2 = (TTree*)f2->Get("DecayTree");
    
    
@@ -110,7 +120,7 @@ int FitBm(){
    //Bu_mc_mass -> Delete();
    f2->Delete();
    //--------------------------Getting the same sign data and extracting a roodatahist and PDF-----------------------------------------//
-   TFile *f3 = new TFile("../../data/Data2016_Strip28r1_MagUp_SSsmall100withcutsbc.root");
+   TFile *f3 = new TFile("/afs/cern.ch/work/z/zwolffs/public/data/DataRun/Data2016_Strip28r1_MagUp50Bcm.root"); // Change this later!! Temporary
    TTree *tr3 = (TTree*)f3->Get("DecayTree");
    
    Float_t B_CM3;
@@ -136,7 +146,7 @@ int FitBm(){
    //Bss_mc_mass -> Delete();/
    f3->Delete();
    //--------------------------Getting the histogram with D mass background-----------------------------------------//
-   TFile *f4 = new TFile("../../data/D_M_bkg500bins.root");
+   TFile *f4 = new TFile("/afs/cern.ch/work/z/zwolffs/public/data/DataRun/Data2016_Strip28r1_MagUp300BcmDMbkg.root");
    TH1F *h2Bmass = (TH1F*)f4->Get("h2Bmass");
 
    RooDataHist* BM_DM_bkg= new RooDataHist("Bss_mc", "dataset with y", *y, h2Bmass);
@@ -167,18 +177,18 @@ int FitBm(){
 
    //---------------------------------------------------------Plotting------------------------------------------------------------------//
    
-       model_C->fitTo(*dataC);   
-       TCanvas* c_Cmass_fit = new TCanvas("c_Cmass_fit", "c_Cmass_fit", 0, 650, 650, 550);
-       c_Cmass_fit -> cd();
-       RooPlot* Cmesframe = y->frame(Title("B Corrected Mass;MeV/c^2")) ;   
-       dataC -> plotOn(Cmesframe, Name("CmyHist1")); 
-       model_C->plotOn(Cmesframe, Name("CmyCurve1"),LineColor(4)); 
+     model_C->fitTo(*dataC, SumW2Error(kTRUE));   
+     TCanvas* c_Cmass_fit = new TCanvas("c_Cmass_fit", "c_Cmass_fit", 0, 650, 650, 550);
+     c_Cmass_fit -> cd();
+     RooPlot* Cmesframe = y->frame(Title("B Corrected Mass;MeV/c^2")) ;   
+     dataC -> plotOn(Cmesframe, Name("CmyHist1")); 
+     model_C->plotOn(Cmesframe, Name("CmyCurve1"),LineColor(4)); 
        
-       Cmesframe->Draw();
-       model_C->plotOn(Cmesframe,Components("BdPdf_C"),LineColor(2));   
-       model_C->plotOn(Cmesframe,Components("BuPdf_C"),LineColor(3));   
-       model_C->plotOn(Cmesframe,Components("SSPdf_C"),LineColor(6));   
-       Cmesframe -> Draw();
+     Cmesframe->Draw();
+     model_C->plotOn(Cmesframe,Components("BdPdf_C"),LineColor(2));   
+     model_C->plotOn(Cmesframe,Components("BuPdf_C"),LineColor(3));   
+     model_C->plotOn(Cmesframe,Components("SSPdf_C"),LineColor(6));   
+     Cmesframe -> Draw();
        
        /*
  

@@ -12,7 +12,7 @@ int main(int argc, char** argv){
 
 
    */
-  char* samesign = argv[2];
+  char* samesign = "b2DpMuX_SS";
   std::string filenameCuts_s;
   const char* filenameCuts;
   std::string filenameDMhist_s;
