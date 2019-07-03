@@ -36,7 +36,7 @@ int main(int argc, char** argv){
   
   filenamesweights_s = Fit(filenameDMhist,filenameCuts);
 
-  filenameCutsBCorr_s = Bcm(filenameCuts); // Generate B corrected mass and add it to TTree
+  filenameCutsBCorr_s = Bcm(filenameCuts, argv[2]); // Generate B corrected mass and add it to TTree
 
   filenameCutsBCorr = filenameCutsBCorr_s.c_str();
 
@@ -53,7 +53,7 @@ int main(int argc, char** argv){
   filenameCuts = filenameCuts_s.c_str();
 
   
-  filenameCutsBCorr_s = Bcm(filenameCuts); // Generate B corrected mass and add it to TTree
+  filenameCutsBCorr_s = Bcm(filenameCuts, argv[2]); // Generate B corrected mass and add it to TTree
 
   filenameCutsBCorr = filenameCutsBCorr_s.c_str();
   
