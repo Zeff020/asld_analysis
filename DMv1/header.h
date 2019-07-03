@@ -11,6 +11,6 @@ std::string DmHist(const char* filename);
 
 std::string Fit(const char* filename, const char* filenamedata);
 
-std::string Bcm(const char* filename);
+std::string Bcm(const char* filename, const char* directoryname);
 
 std::string ExtractDBkg(const char* filename);
