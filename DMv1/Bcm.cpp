@@ -27,7 +27,7 @@ This file calculates the corrected B mass of the B data in a given tree and save
 #include "Inclusion.h"
 
 
-std::string Bcm(const char* filename){
+std::string Bcm(const char* filename, const char* dirname){
 
   typedef ROOT::Math::PtEtaPhiMVector MyLorentzVector;
   typedef ROOT::Math::XYZVector ThreeVector;
@@ -73,10 +73,12 @@ std::string Bcm(const char* filename){
   std::string filename_s(filename);
   std::string root = ".root";
   std::string bcm = "Bcm";
-
+  std::string dirname_s(dirname); 
   std::string newfilenamenoroot = filename_s.erase(filename_s.find(".root"));
 
-  std::string newfilename = newfilenamenoroot + bcm + root;
+  
+
+  std::string newfilename = newfilenamenoroot + dirname_s + bcm + root;
   const char *newfilename_c = newfilename.c_str();
 
   

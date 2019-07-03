@@ -19,7 +19,7 @@ using namespace RooStats;
   
 void ExtractDBkg(){
   
-  TFile *f = new TFile("../../data/Data2016_Strip28r1_MagUpsmall100withcutsbc.root");
+  TFile *f = new TFile("/afs/cern.ch/work/z/zwolffs/public/data/Data2016_Strip28r1_MagUpsmall100withcutsbc.root");
   TTree *tr = (TTree*)f->Get("DecayTree");
   
   int nentries=tr->GetEntries();
@@ -38,8 +38,8 @@ void ExtractDBkg(){
   tr -> SetBranchStatus("B_CM",1);
 
   TFile *newf = new TFile("../../data/D_M_bkg500bins.root","recreate");
-  TH1* hDM_bkg = new TH1F("h1", "histo with D Mass sidebands", 500, 1800, 1980);
-  TH1* hBM_DM_bkg = new TH1F("h2", "histo with the corrected B mass datapoints of the D mass sidebands", 500, 2300,7000);
+  TH1* hDM_bkg = new TH1F("h1", "histo with D Mass sidebands", 200, 1800, 1980);
+  TH1* hBM_DM_bkg = new TH1F("h2", "histo with the corrected B mass datapoints of the D mass sidebands", 200, 2300,7000);
   
 
   for (int i = 0; i<nentries; i++){
@@ -55,11 +55,60 @@ void ExtractDBkg(){
   }
   hDM_bkg -> Write();
   
-  newf -> Write();
+  //newf -> Write();
   TCanvas* a = new TCanvas("D and B mass Background","D and B mass background");
   a->Divide(1,2);
   a->cd(1);
-  hBM_DM_bkg -> Draw();
+  hBM_DM_bkg -> DrawNormalized("HIST PLC");
   a->cd(2);
-  hDM_bkg-> Draw();
+  hDM_bkg-> Draw("PLC");
+
+  // Second sideband cuts
+
+  //TFile *newf = new TFile("../../data/D_M_bkg500bins.root","recreate");
+  TH1* hDM_bkg1 = new TH1F("h11", "histo with D Mass sidebands", 200, 1800, 1980);
+  TH1* hBM_DM_bkg1 = new TH1F("h21", "histo with the corrected B mass datapoints of the D mass sidebands", 200, 2300,7000);
+  
+
+  for (int j = 0; j<nentries; j++){
+    tr -> GetEntry(j);
+
+    if ((D_M > 1830) && (D_M <1910)) continue;
+    D_M_bkg = D_M;
+    B_DM_bkg = B_CM;
+    //br_D_M_bkg -> Fill();
+    hDM_bkg1 -> Fill(D_M_bkg);
+    hBM_DM_bkg1 -> Fill(B_DM_bkg);
+    
+  }
+  //hDM_bkg -> Write();
+  
+  //newf -> Write();
+  a->cd(1);
+  hBM_DM_bkg1 -> DrawNormalized("HIST SAME PLC");
+  a->cd(2);
+  hDM_bkg1-> Draw("SAME PLC");
+
+  TH1* hDM_bkg2 = new TH1F("h12", "histo with D Mass sidebands", 200, 1800, 1980);
+  TH1* hBM_DM_bkg2 = new TH1F("h22", "histo with the corrected B mass datapoints of the D mass sidebands", 200, 2300,7000);
+ 
+
+  for (int h = 0; h<nentries; h++){
+    tr -> GetEntry(h);
+
+    if ((D_M > 1820) && (D_M <1920)) continue;
+    D_M_bkg = D_M;
+    B_DM_bkg = B_CM;
+    //br_D_M_bkg -> Fill();
+    hDM_bkg2 -> Fill(D_M_bkg);
+    hBM_DM_bkg2 -> Fill(B_DM_bkg);
+    
+  }
+  //hDM_bkg -> Write();
+  
+  //newf -> Write();
+  a->cd(1);
+  hBM_DM_bkg2 -> DrawNormalized("HIST SAME PLC");
+  a->cd(2);
+  hDM_bkg2-> Draw("SAME PLC");
 }
