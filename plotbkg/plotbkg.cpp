@@ -189,7 +189,7 @@ void plotbkg(){
    }
 
     //2015_MC_Up_Lb2LcD
-    TFile *f9 = new TFile("/afs/cern.ch/work/z/zwolffs/public/data/DataPBkg/2015_MC_Up_Lb2LcD1b2DpMuXBcm.root");
+  TFile *f9 = new TFile("/afs/cern.ch/work/z/zwolffs/public/data/DataPBkg/2015_MC_Up_Lb2LcD1b2DpMuXBcm.root");
   TTree *tr9 = (TTree*)f9->Get("DecayTree");
 
   Float_t B_CM9;
@@ -208,22 +208,17 @@ void plotbkg(){
       
 
     auto C = new TCanvas();
-    gStyle->SetPalette(kNeon);
-    MC_Up_Bs2Dstaunu -> SetLineWidth(3);
-    MC_Up_Bu2DD_DDcocktail_Dpmu -> SetLineWidth(3);
-    MC_Up_Bu2Dststmunu_DpCocktail -> SetLineWidth(3);
-    MC_Up_Lb2LcD -> SetLineWidth(3);
-    MC_Up_Lb2LcD->DrawNormalized("HIST PLC PMC");
-    MC_Up_Bu2DD_DDcocktail_Dpmu->DrawNormalized("HIST PLC SAME");
-    MC_Up_Bs2Dstaunu->DrawNormalized("HIST PLC SAME");
-    MC_Up_Bu2Dststmunu_DpCocktail->DrawNormalized("HIST PLC SAME");
-
-    gPad->BuildLegend();
-    MC_Up_Bs2Dsmunu->DrawNormalized("HIST SAME");
-    MC_Up_Bd2DD_DDcocktail_Dpmu ->DrawNormalized("HIST SAME");
-    MC_Up_Bd2Dptaunu->DrawNormalized("HIST SAME");
-    MC_Up_Bd2Dststmunu_DpCocktail->DrawNormalized("HIST SAME");
-    MC_Up_Bd2Dstptaunu_Dppi0->DrawNormalized("HIST SAME");
-    MC_Up_Bd2Dststmunu_DpCocktailHigher->DrawNormalized("HIST SAME");
+    gStyle->SetPalette(kRainBow);
+    //MC_Up_Lb2LcD->DrawNormalized("HIST PLC PMC");
+    //MC_Up_Bu2DD_DDcocktail_Dpmu->DrawNormalized("HIST PLC PMC");
+    //MC_Up_Bs2Dstaunu->DrawNormalized("HIST PLC SAME");
+    //MC_Up_Bu2Dststmunu_DpCocktail->DrawNormalized("HIST PLC SAME");
+    //MC_Up_Bs2Dsmunu->DrawNormalized("HIST PLC SAME");
+    //MC_Up_Bd2DD_DDcocktail_Dpmu ->DrawNormalized("HIST PLC  SAME");
+    MC_Up_Bd2Dptaunu->DrawNormalized("HIST PLC SAME");
+    //MC_Up_Bd2Dststmunu_DpCocktail->DrawNormalized("HIST PLC SAME");
+    MC_Up_Bd2Dstptaunu_Dppi0->DrawNormalized("HIST PLC SAME");
+    //MC_Up_Bd2Dststmunu_DpCocktailHigher->DrawNormalized("HIST PLC SAME");
+    gPad -> BuildLegend();
 
 }
