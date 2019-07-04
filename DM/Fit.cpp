@@ -84,7 +84,7 @@ int Fit(){
   mD_canvas->Divide(2) ;
   mD_canvas->cd(1) ; gPad->SetLeftMargin(0.15) ; mD_frame->GetYaxis()->SetTitleOffset(1.6) ; mD_frame->Draw() ;
   mD_canvas->cd(2) ; gPad->SetLeftMargin(0.15) ; pull_frame->GetYaxis()->SetTitleOffset(1.6) ; pull_frame->Draw() ;
-  /*
+  
   //-------------------------------------------------SPLOT-------------------------------------------------//
   sigma1->setConstant();		
   mean1->setConstant();		
@@ -157,7 +157,7 @@ int Fit(){
     }
 
   newf -> Write();
-  */
+  
   return 7;
  
 }
