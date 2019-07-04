@@ -109,6 +109,9 @@ int FitBm(){
    f2->Close();
    //Bu_mc_mass -> Delete();
    f2->Delete();
+   
+   
+ 
    //--------------------------Getting the same sign data and extracting a roodatahist and PDF-----------------------------------------//
    TFile *f3 = new TFile("../../data/Data2016_Strip28r1_MagUp_SSsmall100withcutsbc.root");
    TTree *tr3 = (TTree*)f3->Get("DecayTree");
@@ -120,7 +123,7 @@ int FitBm(){
    
    TH1D * Bss_mc_mass = new TH1D("Bss_mc_mass", "Bss_mc_mass", 250, 2000.0, 7000.0);
    Bss_mc_mass -> Sumw2();
-
+   
    for (int l = 0; l<nentries3; l++){
     
      tr3 -> GetEntry(l);
@@ -143,6 +146,8 @@ int FitBm(){
    RooHistPdf* BM_DM_bkg_Pdf=new RooHistPdf("SSPdf_C", "SSPdf_C", RooArgSet(*y), *BM_DM_bkg, 0);
    
    f4->Close();
+   
+   
    //---------------------------------------------------------Fitting-------------------------------------------------------------------//
    
 
