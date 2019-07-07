@@ -109,7 +109,7 @@ std::string Bcm(const char* filename, const char* dirname){
     ThreeVector perp = threemom - dir*(threemom.Dot(dir)/dmag2);     
     double missing_PT = perp.R();
     B_CM = sqrt((B_M*B_M) + (missing_PT*missing_PT)) + missing_PT;
-    
+    if (B_CM < 0) {B_CM = 0.001;};
     br_B_CM -> Fill();
     //B_corrected_mass->Fill(B_CM,nsig_sw); // Fill the corrected mass WITH the sweights
     }

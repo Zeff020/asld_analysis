@@ -16,7 +16,7 @@
 using namespace RooFit;
 using namespace RooStats;
 
-int FitBm(){
+int FitBmnobkg(){
   
 
   //-------------------------- Getting the original dataset and extracting a weighted roodatahist-------------------------------------//
@@ -182,12 +182,12 @@ int FitBm(){
 
    //---------------------------------------------------------Plotting------------------------------------------------------------------//
    
-     model_C->fitTo(*dataC, SumW2Error(kTRUE));   
+     model_C->fitTo(*dataC, SumW2Error(kTRUE));
      TCanvas* c_Cmass_fit = new TCanvas("c_Cmass_fit", "c_Cmass_fit", 0, 650, 650, 550);
      c_Cmass_fit -> cd();
-     RooPlot* Cmesframe = y->frame(Title("B Corrected Mass;MeV/c^2")) ;   
+     RooPlot* Cmesframe = y->frame(Title("B Corrected Mass;MeV/c^2"));
      dataC -> plotOn(Cmesframe, Name("CmyHist1")); 
-     model_C->plotOn(Cmesframe, Name("CmyCurve1"),LineColor(4)); 
+     peaking_C->plotOn(Cmesframe, Name("CmyCurve1"),LineColor(4)); 
        
      model_C->plotOn(Cmesframe,Components("BdPdf_C"),LineColor(2));   
      model_C->plotOn(Cmesframe,Components("BuPdf_C"),LineColor(3));   
@@ -200,8 +200,7 @@ int FitBm(){
      pull_frame->addPlotable(hpull,"P");
      //c_Cmass_fit -> GetPad(1) -> SetLogy();
      c_Cmass_fit->Divide(2) ;
-     c_Cmass_fit->cd(1) ;/*gPad -> SetLogy()*/; gPad->SetLeftMargin(0.15) ; Cmesframe->GetYaxis()->SetTitleOffset(1.6) ; Cmesframe->Draw() ;
-     c_Cmass_fit->cd(2) ; gPad->SetLeftMargin(0.15) ; pull_frame->GetYaxis()->SetTitleOffset(1.6) ; pull_frame->Draw() ;
+     c_Cmass_fit->cd(1) ;/*gPad -> SetLogy()*/; gPad->SetLeftMargin(0.15) ; Cmesframe->GetYaxis()->SetTitleOffset(1.6) ; Cmesframe->Draw() ;   c_Cmass_fit->cd(2) ; gPad->SetLeftMargin(0.15) ; pull_frame->GetYaxis()->SetTitleOffset(1.6) ; pull_frame->Draw() ;
      
        /*
  

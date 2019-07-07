@@ -122,7 +122,7 @@ int FitBm(){
 
    
    //--------------------------Getting the same sign data and extracting a roodatahist and PDF-----------------------------------------//
-   
+   /*
    TFile *f3 = new TFile("/afs/cern.ch/work/z/zwolffs/public/data/DataRun/Data2016_Strip28r1_MagUp20b2DpMuX_SSBcm.root"); // Change this later!! Temporary
    TTree *tr3 = (TTree*)f3->Get("DecayTree");
    
@@ -157,7 +157,7 @@ int FitBm(){
    RooHistPdf* BM_DM_bkg_Pdf=new RooHistPdf("BM_DM_bkg_Pdf", "BM_DM_bkg_Pdf", RooArgSet(*y), *BM_DM_bkg, 0);
    
    f4->Close();
-   
+   */
    //---------------------------------------------------------Fitting-------------------------------------------------------------------//
    
 
@@ -182,7 +182,7 @@ int FitBm(){
 
    //---------------------------------------------------------Plotting------------------------------------------------------------------//
    
-     model_C->fitTo(*dataC, SumW2Error(kTRUE));   
+     mode->fitTo(*dataC, SumW2Error(kTRUE));   
      TCanvas* c_Cmass_fit = new TCanvas("c_Cmass_fit", "c_Cmass_fit", 0, 650, 650, 550);
      c_Cmass_fit -> cd();
      RooPlot* Cmesframe = y->frame(Title("B Corrected Mass;MeV/c^2")) ;   
