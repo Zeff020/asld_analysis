@@ -1,0 +1,13 @@
+import sys
+
+  # First argument is hadronization fraction, Second argument is generator level efficiencies, Third argument is cut efficiencies. #
+
+    
+    
+HadronFrac = float(sys.argv[1])
+GenEff = float(sys.argv[2])
+CutEff = float(sys.argv[3])
+
+Nbkg = HadronFrac * GenEff * CutEff
+
+print(Nbkg)

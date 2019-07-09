@@ -48,7 +48,7 @@ int FitBm(){
     
   }
 
-   RooRealVar* y = new RooRealVar("y", "y", 2000, 7000);   
+   RooRealVar* y = new RooRealVar("y", "y", 2300, 7000);   
    RooDataHist* dataC = new RooDataHist("dataC", "dataset with y", *y, B_corr_mass_weighted); // Corrected B mass weighted
    
    tr->Delete();
@@ -162,20 +162,20 @@ int FitBm(){
    
 
    // Adding the two bkg pdf's
-   RooRealVar* fracbkgcomp = new RooRealVar("fracbkgcomp", "fraction", 0.5, 0.0, 1.0);
-   RooFormulaVar* Cfracbkgcomp = new RooFormulaVar("Cfrac","1-fracbkgcomp",RooArgSet(*fracbkgcomp));
+   RooRealVar* fracbkgcomp = new RooRealVar("fracbkgcomp", "fraction", 1., 1.0, 1.0);
+   //RooFormulaVar* Cfracbkgcomp = new RooFormulaVar("Cfrac","1-fracbkgcomp",RooArgSet(*fracbkgcomp));
 
-   RooAddPdf* bkg = new RooAddPdf("bkg","background", RooArgList(*SSPdf_C,*BM_DM_bkg_Pdf),RooArgList(*fracbkgcomp, *Cfracbkgcomp));   
+   RooAddPdf* bkg = new RooAddPdf("bkg","background", RooArgList(*SSPdf_C,*BM_DM_bkg_Pdf),RooArgList(*fracbkgcomp/*, *Cfracbkgcomp*/));   
 
    
      RooRealVar* frac = new RooRealVar("frac", "fraction", 0.1, 0.0, 1.0);    
-     RooRealVar* frac_comb= new RooRealVar("frac_comb", "fraction_comb", 0.1, 0.0, 1.0);   
+     RooRealVar* frac_comb= new RooRealVar("frac_comb", "fraction_comb", 0.1, 0.1, 0.1);   
 
-     RooFormulaVar* Cfrac= new RooFormulaVar("Cfrac","1-frac",RooArgSet(*frac));   
-     RooFormulaVar* Cfrac_comb= new RooFormulaVar("Cfrac_comb","1-frac_comb",RooArgSet(*frac_comb));
+     //RooFormulaVar* Cfrac= new RooFormulaVar("Cfrac","1-frac",RooArgSet(*frac));   
+     //RooFormulaVar* Cfrac_comb= new RooFormulaVar("Cfrac_comb","1-frac_comb",RooArgSet(*frac_comb));
 
-     RooAddPdf* peaking_C= new RooAddPdf("peaking_C","peaking_C",RooArgList(*BuPdf_C,*BdPdf_C),RooArgList(*frac, *Cfrac));   
-     RooAddPdf* model_C=new RooAddPdf("model_C","model_C",RooArgList(*bkg,*peaking_C),RooArgList(*frac_comb, *Cfrac_comb));
+     RooAddPdf* peaking_C= new RooAddPdf("peaking_C","peaking_C",RooArgList(*BuPdf_C,*BdPdf_C),RooArgList(*frac/*, *Cfrac*/));   
+     RooAddPdf* model_C=new RooAddPdf("model_C","model_C",RooArgList(*bkg,*peaking_C),RooArgList(*frac_comb/*, *Cfrac_comb*/));
 
 
 
@@ -192,7 +192,7 @@ int FitBm(){
      model_C->plotOn(Cmesframe,Components("BdPdf_C"),LineColor(2));   
      model_C->plotOn(Cmesframe,Components("BuPdf_C"),LineColor(3));   
      model_C->plotOn(Cmesframe,Components("bkg"),LineColor(6));  
-
+     
 
      // Pull plot
      RooHist* hpull = Cmesframe->pullHist("CmyHist1","CmyCurve1") ;
@@ -203,6 +203,10 @@ int FitBm(){
      c_Cmass_fit->cd(1) ;/*gPad -> SetLogy()*/; gPad->SetLeftMargin(0.15) ; Cmesframe->GetYaxis()->SetTitleOffset(1.6) ; Cmesframe->Draw() ;
      c_Cmass_fit->cd(2) ; gPad->SetLeftMargin(0.15) ; pull_frame->GetYaxis()->SetTitleOffset(1.6) ; pull_frame->Draw() ;
      
+
+     
+     RooAbsReal* nsig = model_C -> createIntegral(*y);
+     std::cout << nsig << endl; 
        /*
  
 	 TCanvas* Bcm_canvas = new TCanvas("mD_Fit","mD Fit", 0, 650,650,550);

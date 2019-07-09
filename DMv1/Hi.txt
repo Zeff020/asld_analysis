@@ -1,0 +1,9 @@
+model_C = 
+bkg = 
+SSPdf_C = 
+BM_DM_bkg_Pdf = 
+Cfrac = 1-fracbkgcomp
+peaking_C = 
+BuPdf_C = 
+BdPdf_C = 
+Cfrac_comb = 1-frac_comb
