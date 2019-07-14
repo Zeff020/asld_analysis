@@ -49,7 +49,7 @@ std::string ExtractDBkg(const char* filename){
 
   TFile *newf = new TFile(newfilename_c,"recreate");
   TH1* hDM_bkg = new TH1F("h1Dmass", "histo with D Mass sidebands", 500, 1800, 1980); // DEFINE HERE BINNING
-  TH1* hBM_DM_bkg = new TH1F("h2Bmass", "histo with the corrected B mass datapoints of the D mass sidebands", 500, 2300,7000); // DEFINE HERE BINNING
+  TH1* hBM_DM_bkg = new TH1F("h2Bmass", "histo with the corrected B mass datapoints of the D mass sidebands", 250, 2300,7000); // DEFINE HERE BINNING
   
 
   for (int i = 0; i<nentries; i++){

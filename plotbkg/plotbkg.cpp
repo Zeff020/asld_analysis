@@ -205,19 +205,41 @@ void plotbkg(){
      MC_Up_Lb2LcD-> Fill(B_CM9);
     
    }
+
+
+  //--------------------------Getting the MC Bu dataset and extracting a roodatahist and PDF-----------------------------------------//
+   TFile *f10 = new TFile("/afs/cern.ch/work/z/zwolffs/public/data/DataRun/MC2015Bu_Up1b2DpMuXBcm.root");
+   TTree *tr10 = (TTree*)f10->Get("DecayTree");
+   
+   
+   Float_t B_CM10;
+   Int_t nentries10 = 0; //Providing initial value
+   nentries10 = tr10 -> GetEntries();
+   tr10 -> SetBranchAddress("B_CM",&B_CM10);
+   
+   TH1D * Bu_mc_mass = new TH1D("Bu_mc_mass", "Bu_mc_mass", 100, 2000.0, 6000.0);
+   Bu_mc_mass -> Sumw2();
+
+   for (int q = 0; q<nentries10; q++){
+    
+     tr10 -> GetEntry(q);
+     Bu_mc_mass -> Fill(B_CM10);
+    
+   }
       
 
     auto C = new TCanvas();
     gStyle->SetPalette(kRainBow);
+    Bu_mc_mass-> DrawNormalized("HIST PLC PMC");
     //MC_Up_Lb2LcD->DrawNormalized("HIST PLC PMC");
     //MC_Up_Bu2DD_DDcocktail_Dpmu->DrawNormalized("HIST PLC PMC");
     //MC_Up_Bs2Dstaunu->DrawNormalized("HIST PLC SAME");
     //MC_Up_Bu2Dststmunu_DpCocktail->DrawNormalized("HIST PLC SAME");
     //MC_Up_Bs2Dsmunu->DrawNormalized("HIST PLC SAME");
     //MC_Up_Bd2DD_DDcocktail_Dpmu ->DrawNormalized("HIST PLC  SAME");
-    MC_Up_Bd2Dptaunu->DrawNormalized("HIST PLC SAME");
-    //MC_Up_Bd2Dststmunu_DpCocktail->DrawNormalized("HIST PLC SAME");
-    MC_Up_Bd2Dstptaunu_Dppi0->DrawNormalized("HIST PLC SAME");
+    //MC_Up_Bd2Dptaunu->DrawNormalized("HIST PLC SAME");
+    MC_Up_Bd2Dststmunu_DpCocktail->DrawNormalized("HIST PLC SAME");
+    //MC_Up_Bd2Dstptaunu_Dppi0->DrawNormalized("HIST PLC SAME");
     //MC_Up_Bd2Dststmunu_DpCocktailHigher->DrawNormalized("HIST PLC SAME");
     gPad -> BuildLegend();
 
