@@ -173,7 +173,7 @@ int FitBmNew(){
 
    
    //---------------------------------------------------------Fitting-------------------------------------------------------------------//
-   
+   /* Complicated model
    RooRealVar *nBu = new RooRealVar("nBu", "nBu",20.E5, 0., 10.E6);
     RooRealVar *nc4 = new RooRealVar("nc4", "nc4",20.E5, 0., 10.E6);
    RooRealVar *nsig =  new RooRealVar("nsig", "nsig",20.E5, 0., 10.E6); 	
@@ -182,7 +182,13 @@ int FitBmNew(){
    RooAddPdf* Combo1AndBuPdf = new RooAddPdf("Combo1AndBuPdf","Combo1AndBuPdf",RooArgList(*combo1pdf, *BuPdf_C),RooArgList(*FracCombo1Bu)); // Adding combo 1 and the Bu pdf together with calculated ratios since their shapes are very similar
 
    RooAddPdf* peaking_C= new RooAddPdf("peaking_C","peaking_C",RooArgList(*BdPdf_C, *Combo1AndBuPdf, *combo4pdf),RooArgList(*nsig,*nBu,*nc4));
+   */
    
+   // Simple model (only Bu and Bd)
+    RooRealVar *nBu = new RooRealVar("nBu", "nBu",20.E5, 0., 10.E6);
+   RooRealVar *nsig =  new RooRealVar("nsig", "nsig",20.E5, 0., 10.E6); 
+   
+   RooAddPdf* peaking_C= new RooAddPdf("peaking_C","peaking_C",RooArgList(*BdPdf_C, *BuPdf_C),RooArgList(*nsig,*nBu));
    
    peaking_C->fitTo(*dataC, SumW2Error(kTRUE), PrintLevel(-1));
    
@@ -198,14 +204,14 @@ int FitBmNew(){
    peaking_C->plotOn(Cmesframe,Name("Peaking Curve"),LineColor(4)); 
      
    peaking_C->plotOn(Cmesframe,Components("BdPdf_C"),LineStyle(kDashed),LineColor(2));   
-   peaking_C->plotOn(Cmesframe,Components("Combo1AndBuPdf"),LineStyle(kDashed),LineColor(3)); 
-   peaking_C->plotOn(Cmesframe,Components("combo4pdf"),LineStyle(kDashed),LineColor(4));     
+   //peaking_C->plotOn(Cmesframe,Components("Combo1AndBuPdf"),LineStyle(kDashed),LineColor(3)); 
+   peaking_C->plotOn(Cmesframe,Components("BuPdf_C"),LineStyle(kDashed),LineColor(3));     
 
 
    RooHist* hpull = Cmesframe->pullHist("Data","Peaking Curve") ;
      RooPlot* pull_frame = y -> frame(Title("Pull Distribution")) ;
      pull_frame->addPlotable(hpull,"P");
-     peaking_C->paramOn(Cmesframe, Parameters(RooArgList(*nBu, *nsig, *nc4)), Layout(.64, .89, .8));
+     peaking_C->paramOn(Cmesframe, Parameters(RooArgList(*nBu, *nsig)), Layout(.64, .89, .8));
      //c_Cmass_fit -> GetPad(1) -> SetLogy();
      c_Cmass_fit->Divide(2) ;
      c_Cmass_fit->cd(1) ;/*gPad -> SetLogy()*/; gPad->SetLeftMargin(0.15) ; Cmesframe->GetYaxis()->SetTitleOffset(1.6) ; Cmesframe->Draw() ;
