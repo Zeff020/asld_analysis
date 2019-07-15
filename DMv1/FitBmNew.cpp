@@ -21,7 +21,7 @@ int FitBmNew(){
     //-------------------------- Getting the original dataset and extracting a weighted roodatahist-------------------------------------//
 
 
-  TFile *f = new TFile("/afs/cern.ch/work/z/zwolffs/public/data/DataRun/Data2016_Strip28r1_MagUp1b2DpMuXBcm.root");
+  TFile *f = new TFile("/afs/cern.ch/work/z/zwolffs/public/data/DataRun/Data2015_Strip24r1_MagUp1b2DpMuXBcm.root");
   TTree *tr = (TTree*)f->Get("DecayTree");
 
   Float_t nsig_sw;
@@ -36,7 +36,7 @@ int FitBmNew(){
   B_corr_mass_weighted -> Sumw2();
   
   // Getting the SWeights
-  TFile *fsweights = new TFile("/afs/cern.ch/work/z/zwolffs/public/data/DataRun/Data2016_Strip28r1_MagUp1sweights.root");
+  TFile *fsweights = new TFile("/afs/cern.ch/work/z/zwolffs/public/data/DataRun/Data2015_Strip24r1_MagUp1sweights.root");
   TTree *trsweights = (TTree*)fsweights->Get("DecayTree");
    
   trsweights -> SetBranchAddress("nsig_sw",&nsig_sw);
@@ -171,14 +171,17 @@ int FitBmNew(){
    RooHistPdf* combo4pdf =new RooHistPdf("combo4pdf", "combo4pdf", RooArgSet(*y), *combo4h, 0);
 
 
-
+   
    //---------------------------------------------------------Fitting-------------------------------------------------------------------//
    
-   RooRealVar *nc1 = new RooRealVar("nc1", "nc1",20.E5, 0., 10.E6);
+   RooRealVar *nBu = new RooRealVar("nBu", "nBu",20.E5, 0., 10.E6);
     RooRealVar *nc4 = new RooRealVar("nc4", "nc4",20.E5, 0., 10.E6);
    RooRealVar *nsig =  new RooRealVar("nsig", "nsig",20.E5, 0., 10.E6); 	
-   RooRealVar *nBu =  new RooRealVar("nBu", "nBu",20.E5, 0., 10.E6); 
-   RooAddPdf* peaking_C= new RooAddPdf("peaking_C","peaking_C",RooArgList(*BdPdf_C,*BuPdf_C, *combo1pdf, *combo4pdf),RooArgList(*nsig,*nBu,*nc1, *nc4));
+
+   RooRealVar *FracCombo1Bu = new RooRealVar("FracCombo1Bu","FracCombo1Bu",0.1,0.05,0.15);
+   RooAddPdf* Combo1AndBuPdf = new RooAddPdf("Combo1AndBuPdf","Combo1AndBuPdf",RooArgList(*combo1pdf, *BuPdf_C),RooArgList(*FracCombo1Bu)); // Adding combo 1 and the Bu pdf together with calculated ratios since their shapes are very similar
+
+   RooAddPdf* peaking_C= new RooAddPdf("peaking_C","peaking_C",RooArgList(*BdPdf_C, *Combo1AndBuPdf, *combo4pdf),RooArgList(*nsig,*nBu,*nc4));
    
    
    peaking_C->fitTo(*dataC, SumW2Error(kTRUE), PrintLevel(-1));
@@ -195,15 +198,14 @@ int FitBmNew(){
    peaking_C->plotOn(Cmesframe,Name("Peaking Curve"),LineColor(4)); 
      
    peaking_C->plotOn(Cmesframe,Components("BdPdf_C"),LineStyle(kDashed),LineColor(2));   
-   peaking_C->plotOn(Cmesframe,Components("BuPdf_C"),LineStyle(kDashed),LineColor(3)); 
-   peaking_C->plotOn(Cmesframe,Components("combo4pdf"),LineStyle(kDashed),LineColor(8)); 
-   peaking_C->plotOn(Cmesframe,Components("combo1pdf"),LineStyle(kDashed),LineColor(6));     
+   peaking_C->plotOn(Cmesframe,Components("Combo1AndBuPdf"),LineStyle(kDashed),LineColor(3)); 
+   peaking_C->plotOn(Cmesframe,Components("combo4pdf"),LineStyle(kDashed),LineColor(4));     
 
 
    RooHist* hpull = Cmesframe->pullHist("Data","Peaking Curve") ;
      RooPlot* pull_frame = y -> frame(Title("Pull Distribution")) ;
      pull_frame->addPlotable(hpull,"P");
-     peaking_C->paramOn(Cmesframe, Parameters(RooArgList(*nBu, *nsig, *nc1, *nc4)), Layout(.64, .89, .8));
+     peaking_C->paramOn(Cmesframe, Parameters(RooArgList(*nBu, *nsig, *nc4)), Layout(.64, .89, .8));
      //c_Cmass_fit -> GetPad(1) -> SetLogy();
      c_Cmass_fit->Divide(2) ;
      c_Cmass_fit->cd(1) ;/*gPad -> SetLogy()*/; gPad->SetLeftMargin(0.15) ; Cmesframe->GetYaxis()->SetTitleOffset(1.6) ; Cmesframe->Draw() ;

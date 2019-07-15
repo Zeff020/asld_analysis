@@ -20,7 +20,7 @@ int FitBm(){
   
 
   //-------------------------- Getting the original dataset and extracting a weighted roodatahist-------------------------------------//
-  TFile *f = new TFile("/afs/cern.ch/work/z/zwolffs/public/data/DataRun/Data2016_Strip28r1_MagUp20b2DpMuXBcm.root");
+  TFile *f = new TFile("/afs/cern.ch/work/z/zwolffs/public/data/DataRun/Data2015_Strip24r1_MagUp1b2DpMuXBcm.root");
   TTree *tr = (TTree*)f->Get("DecayTree");
   
   Float_t nsig_sw;
@@ -35,9 +35,8 @@ int FitBm(){
   B_corr_mass_weighted -> Sumw2();
   
   // Getting the SWeights
-  TFile *fsweights = new TFile("/afs/cern.ch/work/z/zwolffs/public/data/DataRun/Data2016_Strip28r1_MagUp20sweights.root");
+  TFile *fsweights = new TFile("/afs/cern.ch/work/z/zwolffs/public/data/DataRun/Data2015_Strip24r1_MagUp1sweights.root");
   TTree *trsweights = (TTree*)fsweights->Get("DecayTree");
-   
   trsweights -> SetBranchAddress("nsig_sw",&nsig_sw);
 
   for (int i = 0; i<nentries; i++){
@@ -123,7 +122,7 @@ int FitBm(){
    
    //--------------------------Getting the same sign data and extracting a roodatahist and PDF-----------------------------------------//
    
-   TFile *f3 = new TFile("/afs/cern.ch/work/z/zwolffs/public/data/DataRun/Data2016_Strip28r1_MagUp20b2DpMuX_SSBcm.root"); // Change this later!! Temporary
+   TFile *f3 = new TFile("/afs/cern.ch/work/z/zwolffs/public/data/DataRun/Data2015_Strip24r1_MagUp1b2DpMuX_SSBcm.root"); 
    TTree *tr3 = (TTree*)f3->Get("DecayTree");
    
    Float_t B_CM3;
@@ -150,7 +149,7 @@ int FitBm(){
    f3->Delete();
    
    //--------------------------Getting the histogram with D mass background-----------------------------------------//
-   TFile *f4 = new TFile("/afs/cern.ch/work/z/zwolffs/public/data/DataRun/Data2016_Strip28r1_MagUp20b2DpMuXBcmDMbkg.root");
+   TFile *f4 = new TFile("/afs/cern.ch/work/z/zwolffs/public/data/DataRun/Data2015_Strip24r1_MagUp1b2DpMuXBcmDMbkg.root");
    TH1F *h2Bmass = (TH1F*)f4->Get("h2Bmass");
 
    RooDataHist* BM_DM_bkg= new RooDataHist("Bss_mc", "dataset with y", *y, h2Bmass);
@@ -163,42 +162,42 @@ int FitBm(){
 
    // Adding the two bkg pdf's
    RooRealVar* fracbkgcomp = new RooRealVar("fracbkgcomp", "fraction", 0.5, 0.0, 1.0);
-   //RooFormulaVar* Cfracbkgcomp = new RooFormulaVar("Cfrac","1-fracbkgcomp",RooArgSet(*fracbkgcomp));
+   RooFormulaVar* Cfracbkgcomp = new RooFormulaVar("Cfrac","1-fracbkgcomp",RooArgSet(*fracbkgcomp));
 
-   //RooAddPdf* bkg = new RooAddPdf("bkg","background", RooArgList(*SSPdf_C,*BM_DM_bkg_Pdf),RooArgList(*fracbkgcomp/*, *Cfracbkgcomp*/));   
+   RooAddPdf* bkg = new RooAddPdf("bkg","background", RooArgList(*SSPdf_C,*BM_DM_bkg_Pdf),RooArgList(*fracbkgcomp, *Cfracbkgcomp));   
 
    
      RooRealVar* frac = new RooRealVar("frac", "fraction", 0.1, 0.0, 1.0);    
-     //RooRealVar* frac_comb= new RooRealVar("frac_comb", "fraction_comb", 0.1, 0.0, 0.1);   
+     RooRealVar* frac_comb= new RooRealVar("frac_comb", "fraction_comb", 0.1, 0.0, 0.1);   
 
-     //RooFormulaVar* Cfrac= new RooFormulaVar("Cfrac","1-frac",RooArgSet(*frac));   
-     //RooFormulaVar* Cfrac_comb= new RooFormulaVar("Cfrac_comb","1-frac_comb",RooArgSet(*frac_comb));
+     RooFormulaVar* Cfrac= new RooFormulaVar("Cfrac","1-frac",RooArgSet(*frac));   
+     RooFormulaVar* Cfrac_comb= new RooFormulaVar("Cfrac_comb","1-frac_comb",RooArgSet(*frac_comb));
 
-     RooAddPdf* peaking_C= new RooAddPdf("peaking_C","peaking_C",RooArgList(*BuPdf_C,*BdPdf_C),RooArgList(*frac/*, *Cfrac*/));   
-     //RooAddPdf* model_C=new RooAddPdf("model_C","model_C",RooArgList(*bkg,*peaking_C),RooArgList(*frac_comb/*, *Cfrac_comb*/));
+     RooAddPdf* peaking_C= new RooAddPdf("peaking_C","peaking_C",RooArgList(*BuPdf_C,*BdPdf_C),RooArgList(*frac, *Cfrac));   
+     RooAddPdf* model_C=new RooAddPdf("model_C","model_C",RooArgList(*bkg,*peaking_C),RooArgList(*frac_comb, *Cfrac_comb));
 
 
 
 
    //---------------------------------------------------------Plotting------------------------------------------------------------------//
    
-     peaking_C->fitTo(*dataC, SumW2Error(kTRUE));   
+     model_C->fitTo(*dataC, SumW2Error(kTRUE));   
      TCanvas* c_Cmass_fit = new TCanvas("c_Cmass_fit", "c_Cmass_fit", 0, 650, 650, 550);
      c_Cmass_fit -> cd();
      RooPlot* Cmesframe = y->frame(Title("B Corrected Mass;MeV/c^2")) ;   
      dataC -> plotOn(Cmesframe, Name("CmyHist1")); 
-     peaking_C->plotOn(Cmesframe, Name("CmyCurve1"),LineColor(4)); 
+     model_C->plotOn(Cmesframe, Name("CmyCurve1"),LineColor(4)); 
        
-     peaking_C->plotOn(Cmesframe,Components("BdPdf_C"),LineStyle(kDashed),LineColor(2));   
-     peaking_C->plotOn(Cmesframe,Components("BuPdf_C"),LineStyle(kDashed),LineColor(3));   
-     //model_C->plotOn(Cmesframe,Components("bkg"),LineColor(6));  
+     model_C->plotOn(Cmesframe,Components("BdPdf_C"),LineStyle(kDashed),LineColor(2));   
+     model_C->plotOn(Cmesframe,Components("BuPdf_C"),LineStyle(kDashed),LineColor(3));   
+     model_C->plotOn(Cmesframe,Components("bkg"),LineColor(6));  
      
 
      // Pull plot
      RooHist* hpull = Cmesframe->pullHist("CmyHist1","CmyCurve1") ;
      RooPlot* pull_frame = y -> frame(Title("Pull Distribution")) ;
      pull_frame->addPlotable(hpull,"P");
-     peaking_C->paramOn(Cmesframe, Parameters(RooArgList(*nbkg, *nsig)), Layout(.64, .89, .8));
+     //peaking_C->paramOn(Cmesframe, Parameters(RooArgList(*nbkg, *nsig)), Layout(.64, .89, .8));
      //c_Cmass_fit -> GetPad(1) -> SetLogy();
      c_Cmass_fit->Divide(2) ;
      c_Cmass_fit->cd(1) ;/*gPad -> SetLogy()*/; gPad->SetLeftMargin(0.15) ; Cmesframe->GetYaxis()->SetTitleOffset(1.6) ; Cmesframe->Draw() ;

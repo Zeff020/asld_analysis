@@ -1,0 +1,104 @@
+#include <TFile.h>                                                                                                                        
+#include <TTree.h>                                                                                                                        
+#include <TROOT.h>
+
+#include "Inclusion.h"
+
+using namespace std;
+
+int plotsignal(){
+
+//-------------------------- Getting the 2016 dataset and extracting a roodatahist and PDF----------------------------------------//
+  TFile *f = new TFile("/afs/cern.ch/work/z/zwolffs/public/data/DataRun/Data2016_Strip28r1_MagUp1b2DpMuXBcm.root");
+  TTree *tr = (TTree*)f->Get("DecayTree");
+
+
+  Float_t nsig_sw;
+  Float_t B_CM;
+  
+  Int_t nentries = 0; //Providing initial value
+  nentries = tr -> GetEntries();
+
+  tr -> SetBranchAddress("B_CM",&B_CM);
+  
+  TH1D * B_corr_mass_weighted = new TH1D("B_mass_2016", "B Mass 2016 dataset", 100, 2000.0, 10000.0);
+  B_corr_mass_weighted -> Sumw2();
+  
+  // Getting the SWeights
+  TFile *fsweights = new TFile("/afs/cern.ch/work/z/zwolffs/public/data/DataRun/Data2016_Strip28r1_MagUp1sweights.root");
+  TTree *trsweights = (TTree*)fsweights->Get("DecayTree");
+   
+  trsweights -> SetBranchAddress("nsig_sw",&nsig_sw);
+
+  for (int i = 0; i<nentries; i++){
+    
+    tr -> GetEntry(i);
+    trsweights -> GetEntry(i);
+    B_corr_mass_weighted -> Fill(B_CM,nsig_sw);
+    
+  }
+
+    //-------------------------- Getting the MC Bd dataset and extracting a roodatahist and PDF----------------------------------------//
+   
+   // OPTION 1
+   TFile *f1 = new TFile("/afs/cern.ch/work/z/zwolffs/public/data/DataRun/MC2015Bd_Up1b2DpMuXBcm.root");
+   TTree *tr1 = (TTree*)f1->Get("DecayTree");
+   
+
+   
+   float B_CM1;
+   Int_t nentries1 = 0; //Providing initial value
+   nentries1 = tr1 -> GetEntries();
+   tr1 -> SetBranchAddress("B_CM",&B_CM1);
+
+   TH1D * Bd_mc_mass = new TH1D("Bd_mc_mass", "Bd monte carlo", 100, 2000.0, 10000.0);
+   Bd_mc_mass -> Sumw2();
+   
+
+   for (int j = 0; j<nentries1; j++){
+    
+    tr1 -> GetEntry(j);
+    Bd_mc_mass -> Fill(B_CM1);
+    
+   }
+
+//-------------------------- Getting the 2015 dataset and extracting a roodatahist and PDF----------------------------------------//
+
+TFile *f2 = new TFile("/afs/cern.ch/work/z/zwolffs/public/data/DataRun/Data2015_Strip24r1_MagUp1b2DpMuXBcm.root");
+  TTree *tr2 = (TTree*)f->Get("DecayTree");
+
+
+  Float_t nsig_sw2;
+  Float_t B_CM2;
+  
+  Int_t nentries2 = 0; //Providing initial value
+  nentries2 = tr2 -> GetEntries();
+
+  tr2 -> SetBranchAddress("B_CM",&B_CM2);
+  
+  TH1D * B_corr_mass_weighted2 = new TH1D("B_mass_2015", "B mass 2015 dataset", 100, 2000.0, 10000.0);
+  B_corr_mass_weighted2 -> Sumw2();
+  
+  // Getting the SWeights
+  TFile *fsweights2 = new TFile("/afs/cern.ch/work/z/zwolffs/public/data/DataRun/Data2015_Strip24r1_MagUp1sweights.root");
+  TTree *trsweights2 = (TTree*)fsweights2->Get("DecayTree");
+   
+  trsweights2 -> SetBranchAddress("nsig_sw",&nsig_sw2);
+
+  for (int k = 0; k<nentries2; k++){
+    
+    tr2 -> GetEntry(k);
+    trsweights2 -> GetEntry(k);
+    B_corr_mass_weighted2 -> Fill(B_CM2,nsig_sw2);
+    
+  }
+   auto C = new TCanvas();
+   gStyle->SetPalette(kRainBow);
+   Bd_mc_mass-> DrawNormalized("HIST PLC PMC");
+   B_corr_mass_weighted -> DrawNormalized("HIST PLC SAME");
+   B_corr_mass_weighted2 -> DrawNormalized("HIST PLC SAME");
+   gPad -> BuildLegend();
+
+
+  return 0;
+}
