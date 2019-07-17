@@ -48,14 +48,14 @@ std::string ExtractDBkg(const char* filename){
   const char *newfilename_c = newfilename.c_str();
 
   TFile *newf = new TFile(newfilename_c,"recreate");
-  TH1* hDM_bkg = new TH1F("h1Dmass", "histo with D Mass sidebands", 500, 1800, 1980); // DEFINE HERE BINNING
-  TH1* hBM_DM_bkg = new TH1F("h2Bmass", "histo with the corrected B mass datapoints of the D mass sidebands", 250, 2300,7000); // DEFINE HERE BINNING
+  TH1* hDM_bkg = new TH1F("h1Dmass", "histo with D Mass sidebands", 100, 1800, 1980); // DEFINE HERE BINNING
+  TH1* hBM_DM_bkg = new TH1F("h2Bmass", "histo with the corrected B mass datapoints of the D mass sidebands", 100, 2300,7000); // DEFINE HERE BINNING
   
 
   for (int i = 0; i<nentries; i++){
     tr -> GetEntry(i);
 
-    if ((D_M > 1841) && (D_M <1895)) continue;
+    if ((D_M > 1820) && (D_M <1920)) continue;
     D_M_bkg = D_M;
     B_DM_bkg = B_CM;
     //br_D_M_bkg -> Fill();

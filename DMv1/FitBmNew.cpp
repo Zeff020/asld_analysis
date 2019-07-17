@@ -51,7 +51,7 @@ int FitBmNew(){
 
    RooRealVar* y = new RooRealVar("y", "y", 2300, 10000);   
    RooDataHist* dataC = new RooDataHist("dataC", "dataset with y", *y, B_corr_mass_weighted); // Corrected B mass weighted
-   
+   /*
    tr->Delete();
    f->Close();
    //B_corr_mass_weighted -> Delete();
@@ -61,7 +61,7 @@ int FitBmNew(){
    fsweights->Close();
    //B_corr_mass_weighted -> Delete();
    fsweights->Delete();
-
+   */
 
    //-------------------------- Getting the MC Bd dataset and extracting a roodatahist and PDF----------------------------------------//
    
@@ -89,12 +89,12 @@ int FitBmNew(){
 
    RooDataHist* Bd_mc= new RooDataHist("Bd_mc", "dataset with y", *y, Bd_mc_mass);
    RooHistPdf* BdPdf_C= new RooHistPdf("BdPdf_C", "BdPdf_C", RooArgSet(*y), *Bd_mc, 0);
-   
+   /*
    tr1->Delete();
    f1->Close();
    //Bd_mc_mass -> Delete();
    f1->Delete();
-
+   */
    //--------------------------Getting the MC Bu dataset and extracting a roodatahist and PDF-----------------------------------------//
    TFile *f2 = new TFile("/afs/cern.ch/work/z/zwolffs/public/data/DataRun/MC2015Bu_Up1b2DpMuXBcm.root");
    TTree *tr2 = (TTree*)f2->Get("DecayTree");
@@ -117,12 +117,12 @@ int FitBmNew(){
    
    RooDataHist* Bu_mc= new RooDataHist("Bu_mc", "dataset with y", *y, Bu_mc_mass);
    RooHistPdf* BuPdf_C= new RooHistPdf("BuPdf_C", "BuPdf_C", RooArgSet(*y), *Bu_mc, 0);
-   
+   /*
    tr2->Delete();
    f2->Close();
    //Bu_mc_mass -> Delete();
    f2->Delete();
-   
+   */
    //---------------------------------Getting the MC sample of the biggest physics background-------------------------------------------//
    
    TFile *f3 = new TFile("/afs/cern.ch/work/z/zwolffs/public/data/DataPBkg/combo1.root");
@@ -170,7 +170,24 @@ int FitBmNew(){
    RooDataHist* combo4h = new RooDataHist("combo4h", "combo4h", *y, combo4);
    RooHistPdf* combo4pdf =new RooHistPdf("combo4pdf", "combo4pdf", RooArgSet(*y), *combo4h, 0);
 
-
+   /*
+   TFile * histograms = new TFile("./histograms.root", "RECREATE");
+   TCanvas * c_histograms = new TCanvas("", "", 0,0, 650, 500);
+   B_corr_mass_weighted->Scale(1.0/B_corr_mass_weighted->Integral("width"));
+   Bd_mc_mass->Scale(1.0/Bd_mc_mass->Integral("width"));
+   Bu_mc_mass->Scale(1.0/Bu_mc_mass->Integral("width"));
+   c_histograms->cd();
+   B_corr_mass_weighted->Draw();
+   Bd_mc_mass->SetLineColor(kRed);
+   Bd_mc_mass->Draw("same");
+   Bu_mc_mass->SetLineColor(kBlue);
+   Bu_mc_mass->Draw("same");
+   histograms->cd();
+   c_histograms->Write();
+   Bd_mc_mass->Write();
+   Bu_mc_mass->Write();
+   B_corr_mass_weighted->Write();
+   */
    
    //---------------------------------------------------------Fitting-------------------------------------------------------------------//
    /* Complicated model
@@ -185,17 +202,17 @@ int FitBmNew(){
    */
    
    // Simple model (only Bu and Bd)
-    RooRealVar *nBu = new RooRealVar("nBu", "nBu",20.E5, 0., 10.E6);
+    RooRealVar *nBu = new RooRealVar("nBu", "nBu",3.E4, 3.E4, 3.E4);
    RooRealVar *nsig =  new RooRealVar("nsig", "nsig",20.E5, 0., 10.E6); 
    
    RooAddPdf* peaking_C= new RooAddPdf("peaking_C","peaking_C",RooArgList(*BdPdf_C, *BuPdf_C),RooArgList(*nsig,*nBu));
    
-   peaking_C->fitTo(*dataC, SumW2Error(kTRUE), PrintLevel(-1));
+   peaking_C->fitTo(*dataC, SumW2Error(kTRUE), PrintLevel(1));
    
    //---------------------------------------------------------Plotting------------------------------------------------------------------//
 
   
-
+   
    TCanvas* c_Cmass_fit = new TCanvas("c_Cmass_fit", "c_Cmass_fit", 0, 650, 650, 550);
    c_Cmass_fit -> cd();
    RooPlot* Cmesframe = y->frame(Title("B Corrected Mass;MeV/c^2"));
@@ -214,7 +231,7 @@ int FitBmNew(){
      peaking_C->paramOn(Cmesframe, Parameters(RooArgList(*nBu, *nsig)), Layout(.64, .89, .8));
      //c_Cmass_fit -> GetPad(1) -> SetLogy();
      c_Cmass_fit->Divide(2) ;
-     c_Cmass_fit->cd(1) ;/*gPad -> SetLogy()*/; gPad->SetLeftMargin(0.15) ; Cmesframe->GetYaxis()->SetTitleOffset(1.6) ; Cmesframe->Draw() ;
+     c_Cmass_fit->cd(1) ;gPad -> SetLogy(); gPad->SetLeftMargin(0.15) ; Cmesframe->GetYaxis()->SetTitleOffset(1.6) ; Cmesframe->Draw() ;
      c_Cmass_fit->cd(2) ; gPad->SetLeftMargin(0.15) ; pull_frame->GetYaxis()->SetTitleOffset(1.6) ; pull_frame->Draw() ;
      
   return 0;
