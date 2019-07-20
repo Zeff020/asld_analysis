@@ -24,21 +24,21 @@ This file applies the cuts to the 2016 dataset and also is capable of decreasing
 #include <Math/Vector4Dfwd.h>
 #include "Inclusion.h"
 
-int DecreaseTreeSizeAndCuts(){
+int DecreaseTreeSizeAndCutsTrig(){
 
   typedef ROOT::Math::PtEtaPhiMVector MyLorentzVector;
 
-  int idecsize = atoi(decsize);
-//Get old file, old tree and set top branch address
+  int idecsize = atoi("20");
+  //Get old file, old tree and set top branch address
 
 
 
-TFile *oldfile = new TFile(filename);
-TDirectoryFile* dir = (TDirectoryFile*)oldfile->Get(dirname);
-TTree *oldtree = (TTree*)dir->Get("DecayTree");
-int nentries=oldtree->GetEntries();
+  TFile *oldfile = new TFile("/afs/cern.ch/work/z/zwolffs/public/data/DataRun/DV2015_Up_Bd2Dpmu_RealData_asl.root"); // Add the original filename here
+  TDirectoryFile* dir = (TDirectoryFile*)oldfile->Get("b2DpMuX");
+  TTree *oldtree = (TTree*)dir->Get("DecayTree");
+  int nentries=oldtree->GetEntries();
 
-// Set variables in tree
+  // Set variables in tree
    Double_t         B_ETA;
    Double_t         B_M;
    Double_t         B_PHI;
@@ -70,12 +70,15 @@ int nentries=oldtree->GetEntries();
    Double_t         Mu_ETA;
    Double_t         Mu_PHI;
    Double_t         Mu_PT;
+   Bool_t            Mu_L0MuonDecision_TOS;
+   Bool_t            Mu_Hlt1TrackMuonDecision_TOS;
+   Bool_t            B_Hlt2TopoMu2BodyBBDTDecision_TOS;
+   Bool_t            B_Hlt2TopoMu3BodyBBDTDecision_TOS;
    
-
    
    Float_t lambda1Mass;   
    Float_t lambda2Mass;   
-   Float_t jpsi1Mass;
+   Float_t jpsi1Mass;     
 
    static Float_t cLight  = 0.299792458; 
    static Float_t massB   = 5279.58;   
@@ -120,6 +123,11 @@ int nentries=oldtree->GetEntries();
    oldtree->SetBranchAddress("Mu_ETA", &Mu_ETA);
    oldtree->SetBranchAddress("Mu_PHI", &Mu_PHI);
    oldtree->SetBranchAddress("Mu_PT", &Mu_PT);
+   oldtree->SetBranchAddress("Mu_L0MuonDecision_TOS",&Mu_L0MuonDecision_TOS);
+   oldtree->SetBranchAddress("Mu_Hlt1TrackMuonDecision_TOS",&Mu_Hlt1TrackMuonDecision_TOS);
+   oldtree->SetBranchAddress("B_Hlt2TopoMu2BodyBBDTDecision_TOS",&B_Hlt2TopoMu2BodyBBDTDecision_TOS);
+   oldtree->SetBranchAddress("B_Hlt2TopoMu3BodyBBDTDecision_TOS",&B_Hlt2TopoMu3BodyBBDTDecision_TOS);
+
 
    // Turn on branches to clone
    oldtree->SetBranchStatus("*",0);
@@ -135,7 +143,7 @@ int nentries=oldtree->GetEntries();
    oldtree->SetBranchStatus("B_OWNPV_X",1);
    oldtree->SetBranchStatus("D_M",1);
   
-   const char *newfilename_c = "" // Add here the filename!!!
+   const char *newfilename_c = "/afs/cern.ch/work/z/zwolffs/public/data/DataRun/DV2015_Up_Bd2Dpmu_RealData_asl1b2DpMuX.root"; // Add here the new filename!!!
    
 
    TFile *newfile = new TFile(newfilename_c,"recreate");
@@ -162,6 +170,11 @@ int nentries=oldtree->GetEntries();
    oldtree->SetBranchStatus("Mu_ETA",1);
    oldtree->SetBranchStatus("Mu_PHI",1);
    oldtree->SetBranchStatus("Mu_PT",1);
+   oldtree->SetBranchStatus("Mu_L0MuonDecision_TOS",1);
+   oldtree->SetBranchStatus("Mu_Hlt1TrackMuonDecision_TOS",1);
+   oldtree->SetBranchStatus("B_Hlt2TopoMu2BodyBBDTDecision_TOS",1);
+   oldtree->SetBranchStatus("B_Hlt2TopoMu3BodyBBDTDecision_TOS",1);
+   
 
 for (Long64_t i=0;i<(nentries/idecsize); i++) {
 
@@ -226,6 +239,12 @@ for (Long64_t i=0;i<(nentries/idecsize); i++) {
        if( Pi1_ISMUON == 1 && jpsi1Mass > 3070 && jpsi1Mass < 3150   ) continue;      
      }
 
+   // Trigger cuts
+   
+   if ( !Mu_L0MuonDecision_TOS ) continue;
+   if ( !Mu_Hlt1TrackMuonDecision_TOS ) continue;
+   if ( !B_Hlt2TopoMu2BodyBBDTDecision_TOS && !B_Hlt2TopoMu3BodyBBDTDecision_TOS ) continue;
+   
    newtree->Fill();
    // Fill new datapoint in tree if all cuts are accepted          
  }

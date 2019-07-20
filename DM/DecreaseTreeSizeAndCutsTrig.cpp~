@@ -24,17 +24,17 @@ This file applies the cuts to the 2016 dataset and also is capable of decreasing
 #include <Math/Vector4Dfwd.h>
 #include "Inclusion.h"
 
-int DecreaseTreeSizeAndCuts(){
+int DecreaseTreeSizeAndCutsTrig(){
 
   typedef ROOT::Math::PtEtaPhiMVector MyLorentzVector;
 
-  int idecsize = atoi(decsize);
+  int idecsize = atoi(1);
 //Get old file, old tree and set top branch address
 
 
 
 TFile *oldfile = new TFile(filename);
-TDirectoryFile* dir = (TDirectoryFile*)oldfile->Get(dirname);
+TDirectoryFile* dir = (TDirectoryFile*)oldfile->Get("b2DpMuX");
 TTree *oldtree = (TTree*)dir->Get("DecayTree");
 int nentries=oldtree->GetEntries();
 
@@ -135,7 +135,7 @@ int nentries=oldtree->GetEntries();
    oldtree->SetBranchStatus("B_OWNPV_X",1);
    oldtree->SetBranchStatus("D_M",1);
   
-   const char *newfilename_c = "" // Add here the filename!!!
+   const char *newfilename_c = "" // Add here the new filename!!!
    
 
    TFile *newfile = new TFile(newfilename_c,"recreate");

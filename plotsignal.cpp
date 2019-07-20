@@ -118,6 +118,7 @@ TFile *f2 = new TFile("/afs/cern.ch/work/z/zwolffs/public/data/DataRun/Data2015_
    Bd_mc_mass -> SetLineColor(kRed);
    Bd_mc_mass-> DrawNormalized("HIST");
    B_corr_mass_weighted2 -> SetLineColor(kGreen);
+   
    B_corr_mass_weighted2 -> DrawNormalized("SAME HIST");
    Bu_mc_mass -> SetLineColor(kBlue);
    Bu_mc_mass -> DrawNormalized("SAME HIST");

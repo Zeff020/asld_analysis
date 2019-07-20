@@ -229,18 +229,33 @@ void plotbkg(){
       
 
     auto C = new TCanvas();
-    gStyle->SetPalette(kRainBow);
-    Bu_mc_mass-> DrawNormalized("HIST PLC PMC");
+    gStyle->SetOptStat(000000000);
+     Bu_mc_mass -> SetTitle("feed-down components; MeV/c^2; Events (normalized)");
+    Bu_mc_mass-> DrawNormalized("HIST");
+    Bu_mc_mass->SetLineColor(kGreen);
     //MC_Up_Lb2LcD->DrawNormalized("HIST PLC PMC");
     //MC_Up_Bu2DD_DDcocktail_Dpmu->DrawNormalized("HIST PLC PMC");
     //MC_Up_Bs2Dstaunu->DrawNormalized("HIST PLC SAME");
-    //MC_Up_Bu2Dststmunu_DpCocktail->DrawNormalized("HIST PLC SAME");
+    MC_Up_Bu2Dststmunu_DpCocktail->SetLineColor(kBlue);
+    MC_Up_Bu2Dststmunu_DpCocktail->DrawNormalized("HIST SAME");
     //MC_Up_Bs2Dsmunu->DrawNormalized("HIST PLC SAME");
     //MC_Up_Bd2DD_DDcocktail_Dpmu ->DrawNormalized("HIST PLC  SAME");
     //MC_Up_Bd2Dptaunu->DrawNormalized("HIST PLC SAME");
-    MC_Up_Bd2Dststmunu_DpCocktail->DrawNormalized("HIST PLC SAME");
+     MC_Up_Bd2Dststmunu_DpCocktail->SetLineColor(kRed);
+    MC_Up_Bd2Dststmunu_DpCocktail->DrawNormalized("HIST SAME");
     //MC_Up_Bd2Dstptaunu_Dppi0->DrawNormalized("HIST PLC SAME");
     //MC_Up_Bd2Dststmunu_DpCocktailHigher->DrawNormalized("HIST PLC SAME");
-    gPad -> BuildLegend();
-
+    
+    
+    
+    TLegend *leg1 = new TLegend(0.65,0.73,0.86,0.87);
+    leg1->SetFillColor(kWhite);
+    leg1->SetLineColor(kWhite);
+    leg1->AddEntry(MC_Up_Bu2Dststmunu_DpCocktail,"B^{+} #rightarrow D** decays ","l");
+    leg1->AddEntry(MC_Up_Bd2Dststmunu_DpCocktail,"B^{0} #rightarrow D** decays","l");
+    //leg1->AddEntry(Cmesframe->findObject("Data"),"Data (4 749 151)");
+    leg1->Draw();
+    
+    
+    
 }

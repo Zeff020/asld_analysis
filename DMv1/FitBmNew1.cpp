@@ -111,7 +111,7 @@ int FitBmNew1(){
    tr3 -> SetBranchAddress("B_CM",&B_CM3);
    
    TH1D * Bu_mc_mass = new TH1D("Bu_mc_mass", "Bu monte carlo", 100, 2000.0, 10000.0);
-   Bu_mc_mass -> Sumw2();
+   //Bu_mc_mass -> Sumw2();
 
    for (int m = 0; m<nentries3; m++){
     
@@ -131,7 +131,7 @@ int FitBmNew1(){
    tr31 -> SetBranchAddress("B_CM",&B_CM31);
    
    TH1D * combo1 = new TH1D("combo1", "combo1", 100, 2000.0, 10000.0);
-   combo1 -> Sumw2();
+   //combo1 -> Sumw2();
    
    for (int l = 0; l<nentries31; l++){
     
@@ -152,7 +152,7 @@ int FitBmNew1(){
    tr4 -> SetBranchAddress("B_CM",&B_CM4);
    
    TH1D * combo4 = new TH1D("combo4", "combo4", 100, 2000.0, 10000.0);
-   combo4 -> Sumw2();
+   //combo4 -> Sumw2();
    
    for (int z = 0; z<nentries4; z++){
     
@@ -188,7 +188,7 @@ int FitBmNew1(){
    gPad -> BuildLegend();
    */
    //----------------------------------------------------Do all the roofit stuff--------------------------------------------------------//
-   RooRealVar* y = new RooRealVar("y", "y", 2300, 10000);
+   RooRealVar* y = new RooRealVar("y", "y", 2300, 7000);
    
    RooDataHist* combo4h = new RooDataHist("combo4h", "combo4h", *y, combo4);
    RooHistPdf* combo4pdf =new RooHistPdf("combo4pdf", "combo4pdf", RooArgSet(*y), *combo4h, 0);
@@ -199,7 +199,7 @@ int FitBmNew1(){
    RooDataHist* h2BmassC = new RooDataHist("h2Bmass","D mass sideband",*y, h2Bmass);
    RooHistPdf* h2BmassC_C = new RooHistPdf("h2BmassC_C", "D mass sideband", RooArgSet(*y), *h2BmassC, 0);
 
-   RooDataHist* dataC = new RooDataHist("dataC", "dataset with y", *y, B_corr_mass_weighted); // Corrected B mass weighted
+   RooDataHist* dataC = new RooDataHist("dataC", "dataset with y", *y, B_corr_mass_weighted2); // Corrected B mass weighted
    RooHistPdf* dataC_C = new RooHistPdf("Data", "Data", RooArgSet(*y), *dataC, 0);
 
    RooDataHist* Bd_mc= new RooDataHist("Bd_mc", "dataset with y", *y, Bd_mc_mass);
@@ -210,16 +210,16 @@ int FitBmNew1(){
 
    //-----------------------------------------------------------------------------------------------------------------------------------//
    
-   /*
+   
    // Plotting the PDF's
    C -> cd();
-   
-   RooPlot* Cmesframe = y->frame(Title("B Corrected Mass;MeV/c^2"));
+   /*
+   RooPlot* Cmesframe = y->frame(Title("B corrected mass fit components;MeV/c^2; Events (normalized)"  ));
    
    dataC_C -> plotOn(Cmesframe, Name("Data") ,LineColor(1));
    BdPdf_C -> plotOn(Cmesframe, Name("Bd"),LineColor(2));
    BuPdf_C -> plotOn(Cmesframe, Name("Bu"),LineColor(3));
-   combo4pdf -> plotOn(Cmesframe, Name("Combo 4"),LineColor(7));
+   //combo4pdf -> plotOn(Cmesframe, Name("Combo 4"),LineColor(7));
    combo1pdf -> plotOn(Cmesframe, Name("Combo 1"),LineColor(6));
    h2BmassC_C -> plotOn(Cmesframe, Name("D mass sideband"), LineColor(5));
    Cmesframe->Draw();
@@ -228,48 +228,91 @@ int FitBmNew1(){
    leg1->SetFillColor(kWhite);
    leg1->SetLineColor(kWhite);
    leg1->AddEntry(Cmesframe->findObject("Data"),"Data");
-   leg1->AddEntry(Cmesframe->findObject("Bd"),"B down");
-   leg1->AddEntry(Cmesframe->findObject("Bu"),"B up");
-   leg1->AddEntry(Cmesframe->findObject("Combo 1"),"Combo 1");
-   leg1->AddEntry(Cmesframe->findObject("Combo 4"),"Combo 4");
-   leg1->AddEntry(Cmesframe->findObject("D mass sideband"),"Sideband D data");
+   leg1->AddEntry(Cmesframe->findObject("Bd"),"Signal");
+   leg1->AddEntry(Cmesframe->findObject("D mass sideband"),"SB bkg.");
+   leg1->AddEntry(Cmesframe->findObject("Bu"),"B^{+} bkg.");
+   leg1->AddEntry(Cmesframe->findObject("Combo 1"),"feed-down");
+   //leg1->AddEntry(Cmesframe->findObject("Combo 4"),"Combo 4");
    leg1->Draw();
+   
+   
    */
    //-------------------------------------------------------The fit model--------------------------------------------------------------//
    
+   /*
+   // Treating every PDF equal with the number of candidates
    RooRealVar *nsig = new RooRealVar("nsig","Number Bd",10.E5,0.0,40.E5);
    RooRealVar *nBu = new RooRealVar("nBu","Number Bu",10.E5,0.0,40.E5);
    RooRealVar *nBkg = new RooRealVar("nBkg","Number Bkg",10.E5,0.0,40.E5);
    RooRealVar *ncombo1 = new RooRealVar("ncombo1","Number combo1",10.E5,0.0,40.E5);
    RooRealVar *ncombo4 = new RooRealVar("ncombo4","Number combo4",10.E5,0.0,40.E5);
+   */
    
-   RooAddPdf* peaking_C= new RooAddPdf("peaking_C","peaking_C",RooArgList(*BdPdf_C, *BuPdf_C,*h2BmassC_C, /**combo1pdf,*/ *combo4pdf),RooArgList(*nsig,*nBu,*nBkg,/**ncombo1,*/*ncombo4  ));
+   RooRealVar *nBkg = new RooRealVar("nBkg","Number Bkg",10.E5,0.0,40.E5);
+   RooRealVar *nsig = new RooRealVar("nsig","Number Bd",10.E5,0.0,40.E5);
+   RooRealVar *nBuAndComb1 = new RooRealVar("nBuAndComb1","Number of combo 1 and Bu",10.E5,0.0,40.E5);
+   RooRealVar *frac = new RooRealVar("frac","fraction Bu and Comb 1",0.6, 0.6, 0.6);
+
+   RooAddPdf* BuAndComb1_C = new RooAddPdf("BuAndComb1_C","BuAndComb1_C",RooArgList(*BuPdf_C,*combo1pdf),RooArgList(*frac));
+
+   RooAddPdf* model_C= new RooAddPdf("model_C","model_C",RooArgList(*BdPdf_C, *BuAndComb1_C ,*h2BmassC_C),RooArgList(*nsig,*nBuAndComb1 ,*nBkg));
    
-   peaking_C->fitTo(*dataC, SumW2Error(kTRUE), PrintLevel(1));
+   model_C->fitTo(*dataC, SumW2Error(kTRUE), PrintLevel(1));
    //-----------------------------------------------Plotting after fit results---------------------------------------------------------//
    
    C -> cd();
-   RooPlot* Cmesframe = y->frame(Title("B Corrected Mass;MeV/c^2"));
+   RooPlot* Cmesframe = y->frame(Title("B corrected mass fit;"));
    
    dataC -> plotOn(Cmesframe, Name("Data")); 
-   peaking_C->plotOn(Cmesframe,Name("Peaking Curve"),LineColor(4)); 
+   model_C->plotOn(Cmesframe,Name("Model_C"),LineColor(4)); 
    
-   peaking_C->plotOn(Cmesframe,Components("BdPdf_C"),LineStyle(kDashed),LineColor(2));   
-   peaking_C->plotOn(Cmesframe,Components("BuPdf_C"),LineStyle(kDashed),LineColor(3));
-   peaking_C->plotOn(Cmesframe,Components("h2BmassC_C"),LineStyle(kDashed),LineColor(5));
-   peaking_C->plotOn(Cmesframe,Components("combo1pdf"),LineStyle(kDashed),LineColor(6));
-   peaking_C->plotOn(Cmesframe,Components("combo4pdf"),LineStyle(kDashed),LineColor(7));
-   peaking_C->paramOn(Cmesframe, Parameters(RooArgList(*nsig,*nBu,*nBkg,*ncombo1, *ncombo4)), Layout(.64, .89, .8));
+   model_C->plotOn(Cmesframe,Components("BdPdf_C"),LineStyle(kDashed),Name("BdPdf_C"),LineColor(2));   
+   model_C->plotOn(Cmesframe,Components("BuPdf_C"),LineStyle(kDashed),Name("BuPdf_C"),LineColor(3));
+   model_C->plotOn(Cmesframe,Components("h2BmassC_C"),LineStyle(kDashed),Name("h2BmassC_C"),LineColor(5));
+   //model_C->plotOn(Cmesframe,Components("BuAndComb1_C"),LineStyle(kDashed),LineColor(5));
+   model_C->plotOn(Cmesframe,Components("combo1pdf"),LineStyle(kDashed),Name("combo1pdf"),LineColor(6));
+   //model_C->plotOn(Cmesframe,Components("combo4pdf"),LineStyle(kDashed),LineColor(7));
+
+   // Calculating absolute value of Bu candidates
+   auto fracval = frac -> getVal();
+   auto nBuAndComb1val = nBuAndComb1 -> getVal();
+   auto nBufl = fracval * nBuAndComb1val;
+   std::cout << nBufl << "Number of B+ components"<< endl;
+   auto nComb1 = (1-fracval) * nBuAndComb1val;
+   std::cout << nComb1 << "Number of combinatorial components" << endl;
+   RooRealVar* nBu = new RooRealVar("nBu","Number Bu", nBufl, nBufl, nBufl);
+   
+   //model_C->paramOn(Cmesframe, Parameters(RooArgList(*nBkg, *nsig, *nBuAndComb1, *frac)), Layout(.64, .89, .8));
    
    
-   RooPlot* pullframe = y->frame();
-   RooHist* hpull = Cmesframe->pullHist("Data", "Peaking Curve");
+   RooPlot* pullframe = y->frame(Title(";MeV/c^2"));
+   RooHist* hpull = Cmesframe->pullHist("Data", "Model_C");
    pullframe -> addPlotable(hpull,"P");
 
-   C->Divide(2) ;
-   C->cd(1) ; gPad->SetLeftMargin(0.15) ; Cmesframe->GetYaxis()->SetTitleOffset(1.6) ; Cmesframe->Draw() ;
-   C->cd(2) ; gPad->SetLeftMargin(0.15) ; pullframe->GetYaxis()->SetTitleOffset(1.6) ; pullframe->Draw() ;
+   C->Divide(1,2) ;
+   C->cd(1) ; gPad->SetLeftMargin(0.15) ;gPad->SetLogy(); Cmesframe->GetYaxis()->SetTitleOffset(1.6) ; Cmesframe->Draw() ;
+   gPad -> SetPad(1.0,0.25,0.0,1.0);
+   gPad->SetBottomMargin(0.0);
+   // Making the legend
+   TLegend *leg1 = new TLegend(0.65,0.73,0.86,0.87);
+   leg1->SetFillColor(kWhite);
+   leg1->SetLineColor(kWhite);
+   leg1->AddEntry(Cmesframe->findObject("Data"),"Data (4 749 151)");
+   leg1->AddEntry(Cmesframe->findObject("BdPdf_C"),"Signal (2 955 939 #pm 3 553)");
+   leg1->AddEntry(Cmesframe->findObject("h2BmassC_C"),"SB bkg. (1 631 539 #pm 4 197)");
+   leg1->AddEntry(Cmesframe->findObject("BuPdf_C"),"B^{+} bkg. (97 004 #pm 3 943)");
+   leg1->AddEntry(Cmesframe->findObject("combo1pdf"),"feed-down (64 669 #pm 1 577)");
+   leg1->Draw();
+   
 
-  return 0;
+   C->cd(2) ; gPad->SetLeftMargin(0.15) ; pullframe->GetYaxis()->SetTitleOffset(1.6) ; pullframe->Draw() ;
+   gPad -> SetTopMargin(0.0);
+   gPad -> SetBottomMargin(0.2);
+   gPad -> SetPad(0.0,0.0,1.0,0.25);
+   pullframe -> GetXaxis() -> SetLabelSize(0.08);
+   pullframe -> GetXaxis() -> SetTitleSize(0.08);
+   pullframe -> GetYaxis() -> SetLabelSize(0.08);
+   
+   return 0;
    
 }

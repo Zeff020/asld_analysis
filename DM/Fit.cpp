@@ -27,8 +27,9 @@ using namespace RooStats;
 
 int Fit(){
   
-  TFile *f = new TFile("/afs/cern.ch/work/z/zwolffs/public/data/DataRun/Data2016_Strip28r1_MagUp1DM.root");
+  TFile *f = new TFile("/afs/cern.ch/work/z/zwolffs/public/data/DataRun/Data2015_Strip24r1_MagUp1DM.root");
   TH1D *D_M_hist = static_cast<TH1D *>(f->Get("D_M_hist"));
+  D_M_hist -> Rebin(3);
   
   // Define mass boundaries
   RooRealVar *mD = new RooRealVar("D_M","mass D",1800, 1980,"MeV"); 
@@ -62,29 +63,51 @@ int Fit(){
 
   //-------------------------------------------------PLOTTING-------------------------------------------------//
   TCanvas* mD_canvas = new TCanvas("mD_Fit","mD Fit");
-  RooPlot* mD_frame = mD -> frame();
+  RooPlot* mD_frame = mD -> frame(Title("D mass fit"));
   data -> plotOn(mD_frame, Name("Data"));
   model->plotOn(mD_frame, Name("Model"));
-  model->plotOn(mD_frame, Name("Sig"),Components("Sig_mD"),LineStyle(kDashed),LineColor(4)); 	
+  model->plotOn(mD_frame, Name("Sig"),Components("Sig_mD"),LineStyle(kDashed),LineColor(kGreen)); 	
   model->plotOn(mD_frame, Name("Bkg"),Components("Bkg_mD"),LineStyle(kDashed),LineColor(2)); 
   
-  model->paramOn(mD_frame, Parameters(RooArgList(*mean1, *nsig)), Layout(.64, .89, .8)); 	
-  data->statOn(mD_frame, What("N"), Layout(.64, .89, .88));
+  //model->paramOn(mD_frame, Parameters(RooArgList(*mean1, *nsig, *nbkg)), Layout(.64, .89, .8)); 	
+  //data->statOn(mD_frame, What("N"), Layout(.64, .89, .88));
   //mD_frame->Draw();
-  
+  auto nsigv = nsig -> getVal();
+  auto nbkgv = nbkg -> getVal();
 
   
   // Pull plot
   RooHist* hpull = mD_frame->pullHist("Data","Model") ;
-  RooPlot* pull_frame = mD -> frame(Title("Pull Distribution")) ;
+  RooPlot* pull_frame = mD -> frame(Title(";MeV/c^2")) ;
   pull_frame->addPlotable(hpull,"P");
 
-
+  gStyle->SetOptStat(000000000);
   // Divide the canvas into subplots
   mD_canvas->Divide(2) ;
   mD_canvas->cd(1) ; gPad->SetLeftMargin(0.15) ; mD_frame->GetYaxis()->SetTitleOffset(1.6) ; mD_frame->Draw() ;
-  mD_canvas->cd(2) ; gPad->SetLeftMargin(0.15) ; pull_frame->GetYaxis()->SetTitleOffset(1.6) ; pull_frame->Draw() ;
+  gPad -> SetPad(1.0,0.25,0.0,1.0);
+   gPad->SetBottomMargin(0.0);
+
+    TLegend *leg1 = new TLegend(0.65,0.73,0.86,0.87);
+  leg1->SetFillColor(kWhite);
+  leg1->SetLineColor(kWhite);
+  leg1->AddEntry(mD_frame->findObject("Data"),"Data (647 656)");
+  leg1->AddEntry(mD_frame->findObject("Model"),"Model");
+  leg1->AddEntry(mD_frame->findObject("Sig"),"Signal (245 896 #pm 665)");
+  leg1->AddEntry(mD_frame->findObject("Bkg"),"Background (401 760 #pm 765)");
+  leg1->Draw();
   
+  mD_canvas->cd(2) ;
+  gPad -> SetTopMargin(0.0);
+   gPad -> SetBottomMargin(0.2);
+   gPad -> SetPad(0.0,0.0,1.0,0.25);
+   pull_frame -> GetXaxis() -> SetLabelSize(0.10);
+   pull_frame -> GetXaxis() -> SetTitleSize(0.08);
+   pull_frame -> GetYaxis() -> SetLabelSize(0.08);
+
+  gPad->SetLeftMargin(0.15) ; pull_frame->GetYaxis()->SetTitleOffset(1.6) ; pull_frame->Draw() ;
+
+  /*
   //-------------------------------------------------SPLOT-------------------------------------------------//
   sigma1->setConstant();		
   mean1->setConstant();		
@@ -119,7 +142,7 @@ int Fit(){
   //---------------------------------------------B CORRECTED------------------------------------------------//
   
   //-------------------------------------------------SAVE---------------------------------------------------//
-
+  filename = "/afs/cern.ch/work/z/zwolffs/public/data/DataRun/Data2016_Strip28r1_MagUp1DM.root";
   std::string filename_s(filename);
   std::string root = ".root";
   std::string DM = "DM";
@@ -157,7 +180,8 @@ int Fit(){
     }
 
   newf -> Write();
-  
+  */
+
   return 7;
  
 }
