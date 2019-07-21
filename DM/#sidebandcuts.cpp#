@@ -38,8 +38,8 @@ void ExtractDBkg(){
   tr -> SetBranchStatus("B_CM",1);
 
   TFile *newf = new TFile("../../data/D_M_bkg500bins.root","recreate");
-  TH1* hDM_bkg = new TH1F("h1", "D Mass sidebands", 200, 1800, 1980);
-  TH1* hBM_DM_bkg = new TH1F("h2", "Corrected B mass datapoints of the D mass sidebands", 200, 2300,7000);
+  TH1* hDM_bkg = new TH1F("h1", "histo with D Mass sidebands", 200, 1800, 1980);
+  TH1* hBM_DM_bkg = new TH1F("h2", "histo with the corrected B mass datapoints of the D mass sidebands", 200, 2300,7000);
   
 
   for (int i = 0; i<nentries; i++){
@@ -56,6 +56,12 @@ void ExtractDBkg(){
   hDM_bkg -> Write();
   
   //newf -> Write();
+  TCanvas* a = new TCanvas("D and B mass Background","D and B mass background");
+  a->Divide(1,2);
+  a->cd(1);
+  hBM_DM_bkg -> DrawNormalized("HIST PLC");
+  a->cd(2);
+  hDM_bkg-> Draw("PLC");
 
   // Second sideband cuts
 
@@ -78,14 +84,20 @@ void ExtractDBkg(){
   //hDM_bkg -> Write();
   
   //newf -> Write();
+  a->cd(1);
+  hBM_DM_bkg1 -> DrawNormalized("HIST SAME PLC");
+  a->cd(2);
+  hDM_bkg1-> Draw("SAME PLC");
 
-  TH1* hDM_bkg2 = new TH1F("h12", "D Mass sidebands", 200, 1800, 1980);
+  TH1* hDM_bkg2 = new TH1F("h12", "histo with D Mass sidebands", 200, 1800, 1980);
   TH1* hBM_DM_bkg2 = new TH1F("h22", "histo with the corrected B mass datapoints of the D mass sidebands", 200, 2300,7000);
  
 
   for (int h = 0; h<nentries; h++){
     tr -> GetEntry(h);
+    
 
+    
     if ((D_M > 1820) && (D_M <1920)) continue;
     D_M_bkg = D_M;
     B_DM_bkg = B_CM;
@@ -94,25 +106,8 @@ void ExtractDBkg(){
     hBM_DM_bkg2 -> Fill(B_DM_bkg);
     
   }
-  //hDM_bkg -> Write();
-  
-  //newf -> Write();
-   TCanvas* a = new TCanvas("D and B mass Background","D and B mass background");
-  a->Divide(1,2);
   a->cd(1);
-  hBM_DM_bkg -> SetLineColor(kGreen);
-  hBM_DM_bkg -> GetXaxis() -> SetTitle("MeV/c^2");
-  hBM_DM_bkg -> GetYaxis() -> SetTitle("Entries (normalized)");
-  hBM_DM_bkg -> DrawNormalized("HIST SAME");
-  hBM_DM_bkg1 -> SetLineColor(kRed);
-  hBM_DM_bkg1 -> DrawNormalized("HIST SAME");
-  hBM_DM_bkg2 -> DrawNormalized("HIST SAME");
+  hBM_DM_bkg2 -> DrawNormalized("HIST SAME PLC");
   a->cd(2);
-  hDM_bkg -> SetLineColor(kGreen);
-  hDM_bkg -> GetXaxis() -> SetTitle("MeV/c^2");
-  hDM_bkg -> GetYaxis() -> SetTitle("Entries");
-  hDM_bkg-> Draw("HIST SAME");
-  hDM_bkg1-> SetLineColor(kRed);
-  hDM_bkg1-> Draw("HIST SAME");
-  hDM_bkg2-> Draw("HIST SAME");
+  hDM_bkg2-> Draw("SAME PLC");
 }

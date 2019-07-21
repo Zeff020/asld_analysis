@@ -29,23 +29,27 @@ int FitBmNew1(){
   tr -> SetBranchAddress("B_CM",&B_CM);
   
   TH1D * B_corr_mass_weighted = new TH1D("B_mass_2016", "B Mass 2016 dataset", 100, 2000.0, 10000.0);
-  //B_corr_mass_weighted -> Sumw2();
+  B_corr_mass_weighted -> Sumw2();
   
   // Getting the SWeights
-  //TFile *fsweights = new TFile("/afs/cern.ch/work/z/zwolffs/public/data/DataRun/Data2016_Strip28r1_MagUp1sweights.root");
-  //TTree *trsweights = (TTree*)fsweights->Get("DecayTree");
+  TFile *fsweights = new TFile("/afs/cern.ch/work/z/zwolffs/public/data/DataRun/Data2016_Strip28r1_MagUp1sweights.root");
+  TTree *trsweights = (TTree*)fsweights->Get("DecayTree");
    
-  //trsweights -> SetBranchAddress("nsig_sw",&nsig_sw);
-
+  trsweights -> SetBranchAddress("nsig_sw",&nsig_sw);
+  int counter = 0;
   for (int i = 0; i<nentries; i++){
     
     tr -> GetEntry(i);
-    //trsweights -> GetEntry(i);
-    B_corr_mass_weighted -> Fill(B_CM/*,nsig_sw*/);
+    trsweights -> GetEntry(i);
+    if (nsig_sw <= 0.0){
+      nsig_sw = 0.001;
+      counter++;
+    }
+    B_corr_mass_weighted -> Fill(B_CM,nsig_sw);
     
   }
   
-    //-------------------------- Getting the MC Bd dataset and extracting a roodatahist and PDF----------------------------------------//
+    //----------//---------------- Getting the MC Bd dataset and extracting a roodatahist and PDF----------------------------------------//
    
    // OPTION 1
    TFile *f1 = new TFile("/afs/cern.ch/work/z/zwolffs/public/data/DataRun/MC2015Bd_Up1b2DpMuXBcm.root");
@@ -87,16 +91,20 @@ int FitBmNew1(){
   //B_corr_mass_weighted2 -> Sumw2();
   
   // Getting the SWeights
-  //TFile *fsweights2 = new TFile("/afs/cern.ch/work/z/zwolffs/public/data/DataRun/Data2015_Strip24r1_MagUp1sweights.root");
-  //TTree *trsweights2 = (TTree*)fsweights2->Get("DecayTree");
+  TFile *fsweights2 = new TFile("/afs/cern.ch/work/z/zwolffs/public/data/DataRun/Data2015_Strip24r1_MagUp1sweights.root");
+  TTree *trsweights2 = (TTree*)fsweights2->Get("DecayTree");
    
-  //trsweights2 -> SetBranchAddress("nsig_sw",&nsig_sw2);
-
+  trsweights2 -> SetBranchAddress("nsig_sw",&nsig_sw2);
+  int counter2 = 0;
   for (int k = 0; k<nentries2; k++){
     
     tr2 -> GetEntry(k);
-    //trsweights2 -> GetEntry(k);
-    B_corr_mass_weighted2 -> Fill(B_CM2/*,nsig_sw2*/);
+    trsweights2 -> GetEntry(k);
+    if (nsig_sw2 <= 0.0){
+      nsig_sw2 = 0.1;
+      counter2++;
+    }
+    B_corr_mass_weighted2 -> Fill(B_CM2,nsig_sw2);
     
   }
 
@@ -161,12 +169,36 @@ int FitBmNew1(){
    
    }
 
+   
+
    //----------------------------------------Getting the histogram with D mass background----------------------------------------------//
    TFile *f5 = new TFile("/afs/cern.ch/work/z/zwolffs/public/data/DataRun/Data2015_Strip24r1_MagUp1b2DpMuXBcmDMbkg.root");
    TH1F *h2Bmass = (TH1F*)f5->Get("h2Bmass");
    h2Bmass -> Rebin(5); //Doing this for now with 2015 and 2016 nondecreased datasets since the binning on the original hist was 250!
    //----------------------------------------------------------------------------------------------------------------------------------//
    
+   //--------------------------Getting the same sign data and extracting a roodatahist and PDF-----------------------------------------//
+   
+   TFile *f32 = new TFile("/afs/cern.ch/work/z/zwolffs/public/data/DataRun/Data2015_Strip24r1_MagUp1b2DpMuX_SSBcm.root"); 
+   TTree *tr32 = (TTree*)f3->Get("DecayTree");
+   
+   Float_t B_CM32;
+   Int_t nentries32 = 0; //Providing initial value
+   nentries32 = tr32 -> GetEntries();
+   tr32 -> SetBranchAddress("B_CM",&B_CM32);
+   
+   TH1D * Bss_mc_mass = new TH1D("Bss_mc_mass", "Bss_mc_mass", 100, 2000.0, 7000.0);
+   Bss_mc_mass -> Sumw2();
+
+   for (int x = 0; x<nentries32; x++){
+    
+     tr32 -> GetEntry(x);
+     Bss_mc_mass -> Fill(B_CM32);
+    
+   }
+   
+
+   //----------------------------------------------------------------------------------------------------------------------------------//
    auto C = new TCanvas();
    
    // Plotting the histograms!!
@@ -190,6 +222,9 @@ int FitBmNew1(){
    //----------------------------------------------------Do all the roofit stuff--------------------------------------------------------//
    RooRealVar* y = new RooRealVar("y", "y", 2300, 7000);
    
+   RooDataHist* Bss_mc= new RooDataHist("Bss_mc", "dataset with y", *y, Bss_mc_mass);
+   RooHistPdf* SSPdf_C=new RooHistPdf("SSPdf_C", "SSPdf_C", RooArgSet(*y), *Bss_mc, 0);
+
    RooDataHist* combo4h = new RooDataHist("combo4h", "combo4h", *y, combo4);
    RooHistPdf* combo4pdf =new RooHistPdf("combo4pdf", "combo4pdf", RooArgSet(*y), *combo4h, 0);
 
@@ -255,9 +290,9 @@ int FitBmNew1(){
 
    RooAddPdf* BuAndComb1_C = new RooAddPdf("BuAndComb1_C","BuAndComb1_C",RooArgList(*BuPdf_C,*combo1pdf),RooArgList(*frac));
 
-   RooAddPdf* model_C= new RooAddPdf("model_C","model_C",RooArgList(*BdPdf_C, *BuAndComb1_C ,*h2BmassC_C),RooArgList(*nsig,*nBuAndComb1 ,*nBkg));
+   RooAddPdf* model_C= new RooAddPdf("model_C","model_C",RooArgList(*BdPdf_C, *BuAndComb1_C/*, *h2BmassC_C*/),RooArgList(*nsig,*nBuAndComb1 /*,*nBkg*/));
    
-   model_C->fitTo(*dataC, SumW2Error(kTRUE), PrintLevel(1));
+   model_C->fitTo(*dataC, SumW2Error(kFALSE), Minimizer("Minuit2","migrad"), PrintLevel(1));
    //-----------------------------------------------Plotting after fit results---------------------------------------------------------//
    
    C -> cd();
@@ -272,6 +307,7 @@ int FitBmNew1(){
    //model_C->plotOn(Cmesframe,Components("BuAndComb1_C"),LineStyle(kDashed),LineColor(5));
    model_C->plotOn(Cmesframe,Components("combo1pdf"),LineStyle(kDashed),Name("combo1pdf"),LineColor(6));
    //model_C->plotOn(Cmesframe,Components("combo4pdf"),LineStyle(kDashed),LineColor(7));
+   //model_C->plotOn(Cmesframe,Components("SSPdf_C"),LineStyle(kDashed),Name("bkg"),LineColor(7));
 
    // Calculating absolute value of Bu candidates
    auto fracval = frac -> getVal();
@@ -297,11 +333,11 @@ int FitBmNew1(){
    TLegend *leg1 = new TLegend(0.65,0.73,0.86,0.87);
    leg1->SetFillColor(kWhite);
    leg1->SetLineColor(kWhite);
-   leg1->AddEntry(Cmesframe->findObject("Data"),"Data (4 749 151)");
-   leg1->AddEntry(Cmesframe->findObject("BdPdf_C"),"Signal (2 955 939 #pm 3 553)");
-   leg1->AddEntry(Cmesframe->findObject("h2BmassC_C"),"SB bkg. (1 631 539 #pm 4 197)");
-   leg1->AddEntry(Cmesframe->findObject("BuPdf_C"),"B^{+} bkg. (97 004 #pm 3 943)");
-   leg1->AddEntry(Cmesframe->findObject("combo1pdf"),"feed-down (64 669 #pm 1 577)");
+   leg1->AddEntry(Cmesframe->findObject("Data"),"Data (465 434)");
+   leg1->AddEntry(Cmesframe->findObject("BdPdf_C"),"Signal (412 933 #pm 1 075)");
+   //leg1->AddEntry(Cmesframe->findObject("h2BmassC_C"),"SB bkg. (1 631 539 #pm 4 197)");
+   leg1->AddEntry(Cmesframe->findObject("BuPdf_C"),"B^{+} bkg. (31 500 #pm 536)");
+   leg1->AddEntry(Cmesframe->findObject("combo1pdf"),"feed-down (21 001 #pm 357)");
    leg1->Draw();
    
 
@@ -312,7 +348,8 @@ int FitBmNew1(){
    pullframe -> GetXaxis() -> SetLabelSize(0.08);
    pullframe -> GetXaxis() -> SetTitleSize(0.08);
    pullframe -> GetYaxis() -> SetLabelSize(0.08);
-   
+   cout << counter<< endl;
+   cout << counter2;
    return 0;
    
 }

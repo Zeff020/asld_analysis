@@ -29,6 +29,7 @@ std::string Fit(const char* filename,const char* filenamedata){
   
   TFile *f = new TFile(filename);
   TH1D *D_M_hist = static_cast<TH1D *>(f->Get("D_M_hist"));
+  D_M_hist -> Rebin(5);
   
   // Define mass boundaries
   RooRealVar *mD = new RooRealVar("D_M","mass D",1800, 1980,"MeV"); 
