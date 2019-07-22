@@ -52,7 +52,7 @@ int FitBmNew1(){
     //----------//---------------- Getting the MC Bd dataset and extracting a roodatahist and PDF----------------------------------------//
    
    // OPTION 1
-   TFile *f1 = new TFile("/afs/cern.ch/work/z/zwolffs/public/data/DataRun/MC2015Bd_Up1b2DpMuXBcm.root");
+   TFile *f1 = new TFile("/afs/cern.ch/work/z/zwolffs/public/data/DataRun/DTT_2015_MC_Up_Bd2Dpmunu_118740421b2DpMuXBcm.root");
    TTree *tr1 = (TTree*)f1->Get("DecayTree");
    
 
@@ -280,8 +280,9 @@ int FitBmNew1(){
    RooRealVar *nBu = new RooRealVar("nBu","Number Bu",10.E5,0.0,40.E5);
    RooRealVar *nBkg = new RooRealVar("nBkg","Number Bkg",10.E5,0.0,40.E5);
    RooRealVar *ncombo1 = new RooRealVar("ncombo1","Number combo1",10.E5,0.0,40.E5);
-   RooRealVar *ncombo4 = new RooRealVar("ncombo4","Number combo4",10.E5,0.0,40.E5);
    */
+   RooRealVar *ncombo4 = new RooRealVar("ncombo4","Number combo4",10.E5,0.0,40.E5);
+   
    
    RooRealVar *nBkg = new RooRealVar("nBkg","Number Bkg",10.E5,0.0,40.E5);
    RooRealVar *nsig = new RooRealVar("nsig","Number Bd",10.E5,0.0,40.E5);
@@ -290,7 +291,7 @@ int FitBmNew1(){
 
    RooAddPdf* BuAndComb1_C = new RooAddPdf("BuAndComb1_C","BuAndComb1_C",RooArgList(*BuPdf_C,*combo1pdf),RooArgList(*frac));
 
-   RooAddPdf* model_C= new RooAddPdf("model_C","model_C",RooArgList(*BdPdf_C, *BuAndComb1_C/*, *h2BmassC_C*/),RooArgList(*nsig,*nBuAndComb1 /*,*nBkg*/));
+   RooAddPdf* model_C= new RooAddPdf("model_C","model_C",RooArgList(*BdPdf_C, *BuAndComb1_C/*, *h2BmassC_C*/),RooArgList(*nsig,*nBuAndComb1/*,*nBkg*/));
    
    model_C->fitTo(*dataC, SumW2Error(kFALSE), Minimizer("Minuit2","migrad"), PrintLevel(1));
    //-----------------------------------------------Plotting after fit results---------------------------------------------------------//
@@ -318,7 +319,7 @@ int FitBmNew1(){
    std::cout << nComb1 << "Number of combinatorial components" << endl;
    RooRealVar* nBu = new RooRealVar("nBu","Number Bu", nBufl, nBufl, nBufl);
    
-   //model_C->paramOn(Cmesframe, Parameters(RooArgList(*nBkg, *nsig, *nBuAndComb1, *frac)), Layout(.64, .89, .8));
+   //model_C->paramOn(Cmesframe, Parameters(RooArgList(*nBkg, *nsig, *nBuAndComb1, *frac,*ncombo4 )), Layout(.64, .89, .8));
    
    
    RooPlot* pullframe = y->frame(Title(";MeV/c^2"));
@@ -326,18 +327,18 @@ int FitBmNew1(){
    pullframe -> addPlotable(hpull,"P");
 
    C->Divide(1,2) ;
-   C->cd(1) ; gPad->SetLeftMargin(0.15) ;gPad->SetLogy(); Cmesframe->GetYaxis()->SetTitleOffset(1.6) ; Cmesframe->Draw() ;
+   C->cd(1) ; gPad->SetLeftMargin(0.15) ;/*gPad->SetLogy()*/; Cmesframe->GetYaxis()->SetTitleOffset(1.6) ; Cmesframe->Draw() ;
    gPad -> SetPad(1.0,0.25,0.0,1.0);
    gPad->SetBottomMargin(0.0);
    // Making the legend
    TLegend *leg1 = new TLegend(0.65,0.73,0.86,0.87);
    leg1->SetFillColor(kWhite);
    leg1->SetLineColor(kWhite);
-   leg1->AddEntry(Cmesframe->findObject("Data"),"Data (465 434)");
-   leg1->AddEntry(Cmesframe->findObject("BdPdf_C"),"Signal (412 933 #pm 1 075)");
-   //leg1->AddEntry(Cmesframe->findObject("h2BmassC_C"),"SB bkg. (1 631 539 #pm 4 197)");
-   leg1->AddEntry(Cmesframe->findObject("BuPdf_C"),"B^{+} bkg. (31 500 #pm 536)");
-   leg1->AddEntry(Cmesframe->findObject("combo1pdf"),"feed-down (21 001 #pm 357)");
+   leg1->AddEntry(Cmesframe->findObject("Data"),"Data (465 440)");
+   leg1->AddEntry(Cmesframe->findObject("BdPdf_C"),"Signal (412 863 #pm 1 074)");
+   //leg1->AddEntry(Cmesframe->findObject("h2BmassC_C"),"SB bkg. (1 567 792 #pm 4 331)");
+   leg1->AddEntry(Cmesframe->findObject("BuPdf_C"),"B^{+} bkg. (31 546 #pm 535)");
+   leg1->AddEntry(Cmesframe->findObject("combo1pdf"),"feed-down (21 031 #pm 357)");
    leg1->Draw();
    
 

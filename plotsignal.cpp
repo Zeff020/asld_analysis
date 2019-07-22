@@ -9,6 +9,7 @@ using namespace std;
 int plotsignal(){
 
 //-------------------------- Getting the 2016 dataset and extracting a roodatahist and PDF----------------------------------------//
+/*
   TFile *f = new TFile("/afs/cern.ch/work/z/zwolffs/public/data/DataRun/Data2016_Strip28r1_MagUp1b2DpMuXBcm.root");
   TTree *tr = (TTree*)f->Get("DecayTree");
 
@@ -37,11 +38,11 @@ int plotsignal(){
     B_corr_mass_weighted -> Fill(B_CM,nsig_sw);
     
   }
-
+*/
     //-------------------------- Getting the MC Bd dataset and extracting a roodatahist and PDF----------------------------------------//
-   
+  
    // OPTION 1
-   TFile *f1 = new TFile("/afs/cern.ch/work/z/zwolffs/public/data/DataRun/MC2015Bd_Up1b2DpMuXBcm.root");
+   TFile *f1 = new TFile("/afs/cern.ch/work/z/zwolffs/public/data/DataRun/DTT_2015_MC_Up_Bu2Dststmunu_DpCocktail_128740501b2DpMuXBcm.root");
    TTree *tr1 = (TTree*)f1->Get("DecayTree");
    
 
@@ -51,7 +52,7 @@ int plotsignal(){
    nentries1 = tr1 -> GetEntries();
    tr1 -> SetBranchAddress("B_CM",&B_CM1);
 
-   TH1D * Bd_mc_mass = new TH1D("Bd_mc_mass", "Bd monte carlo", 100, 2000.0, 10000.0);
+   TH1D * Bd_mc_mass = new TH1D("Bd_mc_mass", "DTT_2015_MC_Up_Bu2Dststmunu_DpCocktail_12874050", 100, 2000.0, 10000.0);
    Bd_mc_mass -> Sumw2();
    
 
@@ -64,8 +65,8 @@ int plotsignal(){
 
 //-------------------------- Getting the 2015 dataset and extracting a roodatahist and PDF----------------------------------------//
 
-TFile *f2 = new TFile("/afs/cern.ch/work/z/zwolffs/public/data/DataRun/Data2015_Strip24r1_MagUp1b2DpMuXBcm.root");
-  TTree *tr2 = (TTree*)f->Get("DecayTree");
+TFile *f2 = new TFile("/afs/cern.ch/work/z/zwolffs/public/data/DataRun/DTT_2015_MC_Up_Bd2Dstmunu_128750311b2DpMuXBcm.root");
+  TTree *tr2 = (TTree*)f2->Get("DecayTree");
 
 
   Float_t nsig_sw2;
@@ -76,20 +77,14 @@ TFile *f2 = new TFile("/afs/cern.ch/work/z/zwolffs/public/data/DataRun/Data2015_
 
   tr2 -> SetBranchAddress("B_CM",&B_CM2);
   
-  TH1D * B_corr_mass_weighted2 = new TH1D("B_mass_2015", "B mass 2015 dataset", 100, 2000.0, 10000.0);
-  B_corr_mass_weighted2 -> Sumw2();
+  TH1D * B_corr_mass_weighted2 = new TH1D("B_mass_2015", "DTT_2015_MC_Up_Bd2Dstmunu_12875031", 100, 2000.0, 10000.0);
   
-  // Getting the SWeights
-  TFile *fsweights2 = new TFile("/afs/cern.ch/work/z/zwolffs/public/data/DataRun/Data2015_Strip24r1_MagUp1sweights.root");
-  TTree *trsweights2 = (TTree*)fsweights2->Get("DecayTree");
-   
-  trsweights2 -> SetBranchAddress("nsig_sw",&nsig_sw2);
+
 
   for (int k = 0; k<nentries2; k++){
     
     tr2 -> GetEntry(k);
-    trsweights2 -> GetEntry(k);
-    B_corr_mass_weighted2 -> Fill(B_CM2,nsig_sw2);
+    B_corr_mass_weighted2 -> Fill(B_CM2);
     
   }
 
@@ -116,10 +111,12 @@ TFile *f2 = new TFile("/afs/cern.ch/work/z/zwolffs/public/data/DataRun/Data2015_
    auto C = new TCanvas();
    gStyle->SetPalette(kRainBow);
    Bd_mc_mass -> SetLineColor(kRed);
+   B_corr_mass_weighted2 -> SetLineStyle(kDashed);
    Bd_mc_mass-> DrawNormalized("HIST");
    B_corr_mass_weighted2 -> SetLineColor(kGreen);
    
    B_corr_mass_weighted2 -> DrawNormalized("SAME HIST");
+   Bu_mc_mass -> SetLineStyle(kDashed);
    Bu_mc_mass -> SetLineColor(kBlue);
    Bu_mc_mass -> DrawNormalized("SAME HIST");
    gPad -> BuildLegend();
