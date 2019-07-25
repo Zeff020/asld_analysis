@@ -342,7 +342,7 @@ int FitBmNew1(){
    leg1->Draw();
    
 
-   C->cd(2) ; gPad->SetLeftMargin(0.15) ; pullframe->GetYaxis()->SetTitleOffset(1.6) ; pullframe->Draw() ;
+   C->cd(2) ; gPad->SetLeftMargin(0.15) ; pullframe->GetYaxis()->SetTitleOffset(1.6) ; pullframe->Draw();
    gPad -> SetTopMargin(0.0);
    gPad -> SetBottomMargin(0.2);
    gPad -> SetPad(0.0,0.0,1.0,0.25);

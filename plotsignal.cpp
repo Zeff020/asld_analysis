@@ -9,7 +9,7 @@ using namespace std;
 int plotsignal(){
 
 //-------------------------- Getting the 2016 dataset and extracting a roodatahist and PDF----------------------------------------//
-/*
+
   TFile *f = new TFile("/afs/cern.ch/work/z/zwolffs/public/data/DataRun/Data2016_Strip28r1_MagUp1b2DpMuXBcm.root");
   TTree *tr = (TTree*)f->Get("DecayTree");
 
@@ -38,11 +38,11 @@ int plotsignal(){
     B_corr_mass_weighted -> Fill(B_CM,nsig_sw);
     
   }
-*/
+
     //-------------------------- Getting the MC Bd dataset and extracting a roodatahist and PDF----------------------------------------//
   
    // OPTION 1
-   TFile *f1 = new TFile("/afs/cern.ch/work/z/zwolffs/public/data/DataRun/DTT_2015_MC_Up_Bu2Dststmunu_DpCocktail_128740501b2DpMuXBcm.root");
+   TFile *f1 = new TFile("/afs/cern.ch/work/z/zwolffs/public/data/DataRun/DTT_2015_MC_Up_Bd2Dpmunu_118740421b2DpMuXBcm.root");
    TTree *tr1 = (TTree*)f1->Get("DecayTree");
    
 
@@ -52,7 +52,7 @@ int plotsignal(){
    nentries1 = tr1 -> GetEntries();
    tr1 -> SetBranchAddress("B_CM",&B_CM1);
 
-   TH1D * Bd_mc_mass = new TH1D("Bd_mc_mass", "DTT_2015_MC_Up_Bu2Dststmunu_DpCocktail_12874050", 100, 2000.0, 10000.0);
+   TH1D * Bd_mc_mass = new TH1D("Bd_mc_mass", "B^[0] Signal", 100, 2000.0, 10000.0);
    Bd_mc_mass -> Sumw2();
    
 
@@ -65,7 +65,7 @@ int plotsignal(){
 
 //-------------------------- Getting the 2015 dataset and extracting a roodatahist and PDF----------------------------------------//
 
-TFile *f2 = new TFile("/afs/cern.ch/work/z/zwolffs/public/data/DataRun/DTT_2015_MC_Up_Bd2Dstmunu_128750311b2DpMuXBcm.root");
+TFile *f2 = new TFile("/afs/cern.ch/work/z/zwolffs/public/data/DataPBkg/combo1.root");
   TTree *tr2 = (TTree*)f2->Get("DecayTree");
 
 
@@ -77,7 +77,7 @@ TFile *f2 = new TFile("/afs/cern.ch/work/z/zwolffs/public/data/DataRun/DTT_2015_
 
   tr2 -> SetBranchAddress("B_CM",&B_CM2);
   
-  TH1D * B_corr_mass_weighted2 = new TH1D("B_mass_2015", "DTT_2015_MC_Up_Bd2Dstmunu_12875031", 100, 2000.0, 10000.0);
+  TH1D * B_corr_mass_weighted2 = new TH1D("B_mass_2015", "B^[0] feed-down", 100, 2000.0, 10000.0);
   
 
 
@@ -110,16 +110,22 @@ TFile *f2 = new TFile("/afs/cern.ch/work/z/zwolffs/public/data/DataRun/DTT_2015_
 
    auto C = new TCanvas();
    gStyle->SetPalette(kRainBow);
+   Bd_mc_mass -> SetTitle("Signal and feed down components; MeV/c^2; Events (normalized)");
    Bd_mc_mass -> SetLineColor(kRed);
-   B_corr_mass_weighted2 -> SetLineStyle(kDashed);
+   //B_corr_mass_weighted2 -> SetLineStyle(kDashed);
    Bd_mc_mass-> DrawNormalized("HIST");
    B_corr_mass_weighted2 -> SetLineColor(kGreen);
    
    B_corr_mass_weighted2 -> DrawNormalized("SAME HIST");
-   Bu_mc_mass -> SetLineStyle(kDashed);
-   Bu_mc_mass -> SetLineColor(kBlue);
-   Bu_mc_mass -> DrawNormalized("SAME HIST");
-   gPad -> BuildLegend();
+   //Bu_mc_mass -> SetLineStyle(kDashed);
+   //Bu_mc_mass -> SetLineColor(kBlue);
+   //Bu_mc_mass -> DrawNormalized("SAME HIST");
+   TLegend *leg1 = new TLegend(0.65,0.73,0.86,0.87);
+   leg1->SetFillColor(kWhite);
+   leg1->SetLineColor(kWhite);
+   leg1->AddEntry(B_corr_mass_weighted2,"B^{0} feed-down");
+   leg1->AddEntry(Bd_mc_mass,"B^{0} signal");
+   leg1->Draw();
 
 
   return 0;
